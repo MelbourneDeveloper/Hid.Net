@@ -182,9 +182,9 @@ namespace Hid.Net
             return true;
         }
 
-        public async Task<bool> InitializeAsync()
+        public async Task InitializeAsync()
         {
-            return Initialize();
+            await Task.Run(() => Initialize());
         }
 
         public async Task<byte[]> ReadAsync()
