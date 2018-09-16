@@ -97,6 +97,10 @@ namespace Hid.Net.UWP
         #region Private Methods
         public async Task InitializeAsync()
         {
+            //TODO: Put a lock here to stop reentrancy of multiple calls
+
+            Dispose();
+
             Logger.Log("Initializing Hid device", null, nameof(UWPHidDevice));
 
             foreach (var deviceInformation in _WindowsDeviceInformationList)
