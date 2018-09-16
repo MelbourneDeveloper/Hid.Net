@@ -28,6 +28,7 @@ namespace Hid.Net.UWP
         #endregion
 
         #region Public Properties
+        [Obsolete("This should not be here. Please don't use this. This is a list of enumerated devices. This should only be done staticly. This will be refactored away at some point")]
         public List<wde.DeviceInformation> WindowsDeviceInformationList
         {
             get
@@ -134,6 +135,7 @@ namespace Hid.Net.UWP
         public void Dispose()
         {
             _HidDevice.Dispose();
+            _TaskCompletionSource?.Task?.Dispose();
         }
 
         public async Task<byte[]> ReadAsync()
