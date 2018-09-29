@@ -217,7 +217,8 @@ namespace Hid.Net.Android
 
             try
             {
-                Dispose();
+                //TODO:
+                //Dispose();
 
                 var isPermissionGranted = await RequestPermissionAsync();
                 if (!isPermissionGranted.HasValue)
