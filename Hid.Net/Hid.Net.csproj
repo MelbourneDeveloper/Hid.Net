@@ -7,8 +7,8 @@
     <SignAssembly>false</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
-    <Version>1.2.2</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.3.0</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://github.com/MelbourneDeveloper/Hid.Net/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Christian Findlay</Copyright>
@@ -19,12 +19,12 @@ Cross platform Hid (USB) library.
 Enumerate Hid (USB) devices and read and write to/from them. 
 Supports .NET, Android, and UWP out of the box. Other platforms can be added</Description>
     <PackageTags>Hid USB Android UWP Ledger Trezor</PackageTags>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
-    <FileVersion>1.2.2.0</FileVersion>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <FileVersion>1.3.0.0</FileVersion>
     <Authors>Christian Findlay</Authors>
     <Company>Christian Findlay</Company>
     <RepositoryUrl>https://github.com/MelbourneDeveloper/Hid.Net</RepositoryUrl>
-    <PackageReleaseNotes>Allow for passing DeviceInformation in after construction of WindowsHidDevice. This allows for external polling.</PackageReleaseNotes>
+    <PackageReleaseNotes>Allow reconnect on faulted devices</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

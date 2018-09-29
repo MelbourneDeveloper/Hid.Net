@@ -99,6 +99,8 @@ namespace Hid.Net.Android
         {
             _UsbDeviceConnection?.Dispose();
             _UsbDevice?.Dispose();
+            _ReadEndpoint?.Dispose();
+            _WriteEndpoint?.Dispose();
         }
 
         //TODO: Make async properly
@@ -205,6 +207,7 @@ namespace Hid.Net.Android
 
         public async Task InitializeAsync()
         {
+            //TODO: Use a semaphore lock here
             if (_IsInitializing)
             {
                 return;
@@ -214,6 +217,8 @@ namespace Hid.Net.Android
 
             try
             {
+                Dispose();
+
                 var isPermissionGranted = await RequestPermissionAsync();
                 if (!isPermissionGranted.HasValue)
                 {
