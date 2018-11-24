@@ -43,14 +43,14 @@ namespace Hid.Net.UWP
 
             try
             {
-                var deviceInformation = await GetDevicesByIdSlowAsync();
+                var foundDeviceInformations = await GetDevicesByIdSlowAsync();
 
-                if (UWPHidDevice.WindowsDeviceInformationList == null && (deviceInformation.Count > 0))
+                if (UWPHidDevice.WindowsDeviceInformationList == null && (foundDeviceInformations.Count > 0))
                 {
-                    UWPHidDevice.WindowsDeviceInformationList = deviceInformation;
+                    UWPHidDevice.WindowsDeviceInformationList = foundDeviceInformations;
                 }
 
-                if (UWPHidDevice.WindowsDeviceInformationList != null && (deviceInformation.Count == 0))
+                if (UWPHidDevice.WindowsDeviceInformationList != null && (foundDeviceInformations.Count == 0))
                 {
                     UWPHidDevice.WindowsDeviceInformationList = null;
                 }
@@ -79,7 +79,17 @@ namespace Hid.Net.UWP
             var vendorIdString = $"VID_{ VendorId.ToString("X").PadLeft(4, '0')}".ToLower();
             var productIdString = $"PID_{ ProductId.ToString("X").PadLeft(4, '0')}".ToLower();
 
-            return allDevices.Where(args => args.Id.ToLower().Contains(vendorIdString) && args.Id.ToLower().Contains(productIdString) && args.IsEnabled).ToList();
+            var filteredDevices = allDevices.Where(args => args.Id.ToLower().Contains(vendorIdString) && args.Id.ToLower().Contains(productIdString) && args.IsEnabled).ToList();
+
+            foreach(var deviceInformation in filteredDevices)
+            {
+                foreach(var keyValuePair in deviceInformation.Properties)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Key: {keyValuePair.Key} Value: {keyValuePair.Value}");
+                }
+            }
+
+            return filteredDevices;
         }
         #endregion
 
