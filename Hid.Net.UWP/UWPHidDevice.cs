@@ -102,7 +102,7 @@ namespace Hid.Net.UWP
 
             if (string.IsNullOrEmpty(DeviceId))
             {
-                var foundDevices = await UWPHelpers.GetDevicesByProductAndVendor(VendorId, ProductId);
+                var foundDevices = await UWPHelpers.GetDevicesByProductAndVendorAsync(VendorId, ProductId);
 
                 if (foundDevices.Count == 0)
                 {
