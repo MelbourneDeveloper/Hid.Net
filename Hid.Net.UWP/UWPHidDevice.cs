@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Storage;
-using wde = Windows.Devices.Enumeration;
 
 namespace Hid.Net.UWP
 {
@@ -104,7 +102,7 @@ namespace Hid.Net.UWP
 
             if (string.IsNullOrEmpty(DeviceId))
             {
-                var foundDevices = ((IEnumerable<wde.DeviceInformation>)await wde.DeviceInformation.FindAllAsync($"System.Devices.InterfaceEnabled:=System.StructuredQueryType.Boolean#True AND System.DeviceInterface.Hid.VendorId:={VendorId} AND System.DeviceInterface.Hid.ProductId:={ProductId} ").AsTask()).ToList();
+                var foundDevices = await UWPHelpers.GetDevicesByProductAndVendor(VendorId, ProductId);
 
                 if (foundDevices.Count == 0)
                 {
