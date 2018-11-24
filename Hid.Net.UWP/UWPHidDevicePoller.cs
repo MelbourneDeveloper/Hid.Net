@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using wde = Windows.Devices.Enumeration;
@@ -43,16 +42,25 @@ namespace Hid.Net.UWP
 
             try
             {
-                var deviceInformation = await GetDevicesByIdSlowAsync();
+                var foundDeviceInformations = await UWPHelpers.GetDevicesByProductAndVendorAsync(VendorId, ProductId);
 
-                if (UWPHidDevice.WindowsDeviceInformationList == null && (deviceInformation.Count > 0))
+                foreach (var deviceInformation in foundDeviceInformations)
                 {
-                    UWPHidDevice.WindowsDeviceInformationList = deviceInformation;
-                }
-
-                if (UWPHidDevice.WindowsDeviceInformationList != null && (deviceInformation.Count == 0))
-                {
-                    UWPHidDevice.WindowsDeviceInformationList = null;
+                    try
+                    {
+                        //Attempt to connect and move to the next one if this one doesn't connect
+                        UWPHidDevice.DeviceId = deviceInformation.Id;
+                        await UWPHidDevice.InitializeAsync();
+                        if (await UWPHidDevice.GetIsConnectedAsync())
+                        {
+                            //Connection was successful
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log("Error connecting to device", ex, nameof(UWPHidDevicePoller));
+                    }
                 }
             }
             catch (Exception ex)
@@ -61,25 +69,6 @@ namespace Hid.Net.UWP
             }
 
             _IsPolling = false;
-        }
-        #endregion
-
-        #region Private Methods
-        public static async Task<wde.DeviceInformationCollection> GetAllDevices()
-        {
-            return await wde.DeviceInformation.FindAllAsync().AsTask();
-        }
-
-        private async Task<List<wde.DeviceInformation>> GetDevicesByIdSlowAsync()
-        {
-            var allDevices = await GetAllDevices();
-
-            Logger.Log($"Device Ids:{string.Join(", ", allDevices.Select(d => d.Id))} Names:{string.Join(", ", allDevices.Select(d => d.Name))}", null, nameof(UWPHidDevicePoller));
-
-            var vendorIdString = $"VID_{ VendorId.ToString("X").PadLeft(4, '0')}".ToLower();
-            var productIdString = $"PID_{ ProductId.ToString("X").PadLeft(4, '0')}".ToLower();
-
-            return allDevices.Where(args => args.Id.ToLower().Contains(vendorIdString) && args.Id.ToLower().Contains(productIdString) && args.IsEnabled).ToList();
         }
         #endregion
 

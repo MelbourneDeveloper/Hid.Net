@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
-using wde = Windows.Devices.Enumeration;
+using Windows.Storage;
 
 namespace Hid.Net.UWP
 {
@@ -16,41 +16,17 @@ namespace Hid.Net.UWP
         #endregion
 
         #region Fields
-        private List<wde.DeviceInformation> _WindowsDeviceInformationList;
         private HidDevice _HidDevice;
         private TaskCompletionSource<byte[]> _TaskCompletionSource = null;
         private readonly Collection<byte[]> _Chunks = new Collection<byte[]>();
-
-        public int VendorId => _HidDevice.VendorId;
-        public int ProductId => throw new NotImplementedException();
-
         private bool _IsReading;
         #endregion
 
         #region Public Properties
-        [Obsolete("This should not be here. Please don't use this. This is a list of enumerated devices. This should only be done staticly. This will be refactored away at some point")]
-        public List<wde.DeviceInformation> WindowsDeviceInformationList
-        {
-            get
-            {
-                return _WindowsDeviceInformationList;
-            }
-            set
-            {
-                _WindowsDeviceInformationList = value;
+        public int VendorId { get; set; }
+        public int ProductId { get; set; }
 
-                if (value == null)
-                {
-                    _HidDevice = null;
-                    _Chunks.Clear();
-                    Disconnected?.Invoke(this, new EventArgs());
-                }
-                else
-                {
-                    InitializeAsync();
-                }
-            }
-        }
+        public string DeviceId { get; set; }
         public bool DataHasExtraByte { get; set; } = true;
         #endregion
 
@@ -94,6 +70,26 @@ namespace Hid.Net.UWP
         }
         #endregion
 
+        #region Constructors
+        public UWPHidDevice()
+        {
+        }
+
+        public UWPHidDevice(string deviceId)
+        {
+            DeviceId = deviceId;
+        }
+
+        /// <summary>
+        /// TODO: Further filter by UsagePage. The problem is that this syntax never seems to work: AND System.DeviceInterface.Hid.UsagePage:=?? 
+        /// </summary>
+        public UWPHidDevice(int vendorId, int productId)
+        {
+            VendorId = vendorId;
+            ProductId = productId;
+        }
+        #endregion
+
         #region Private Methods
         public async Task InitializeAsync()
         {
@@ -104,16 +100,26 @@ namespace Hid.Net.UWP
 
             Logger.Log("Initializing Hid device", null, nameof(UWPHidDevice));
 
-            foreach (var deviceInformation in _WindowsDeviceInformationList)
+            if (string.IsNullOrEmpty(DeviceId))
             {
-                var hidDeviceOperation = HidDevice.FromIdAsync(deviceInformation.Id, Windows.Storage.FileAccessMode.ReadWrite);
-                var task = hidDeviceOperation.AsTask();
-                _HidDevice = await task;
-                if (_HidDevice != null)
+                var foundDevices = await UWPHelpers.GetDevicesByProductAndVendorAsync(VendorId, ProductId);
+
+                if (foundDevices.Count == 0)
                 {
-                    break;
+                    throw new Exception($"There were no enabled devices connected with the ProductId of {ProductId} and VendorId of {VendorId}");
                 }
+
+                if (foundDevices.Count > 1)
+                {
+                    throw new Exception($"There was more than one device connected with the ProductId of {ProductId} and VendorId of {VendorId}");
+                }
+
+                DeviceId = foundDevices.First().Id;
             }
+
+            var hidDeviceOperation = HidDevice.FromIdAsync(DeviceId, FileAccessMode.ReadWrite);
+            var task = hidDeviceOperation.AsTask();
+            _HidDevice = await task;
 
             if (_HidDevice == null)
             {
@@ -171,7 +177,7 @@ namespace Hid.Net.UWP
             byte[] bytes;
             if (DataHasExtraByte)
             {
-                 bytes = new byte[data.Length + 1];
+                bytes = new byte[data.Length + 1];
                 Array.Copy(data, 0, bytes, 1, data.Length);
                 bytes[0] = 0;
             }
