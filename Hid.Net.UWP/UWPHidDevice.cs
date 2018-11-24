@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
+using Windows.Foundation;
 using Windows.Storage;
 
 namespace Hid.Net.UWP
@@ -189,7 +191,20 @@ namespace Hid.Net.UWP
             var buffer = bytes.AsBuffer();
             var outReport = _HidDevice.CreateOutputReport();
             outReport.Data = buffer;
-            var operation = _HidDevice.SendOutputReportAsync(outReport);
+            IAsyncOperation<uint> operation = null;
+
+            try
+            {
+                operation = _HidDevice.SendOutputReportAsync(outReport);
+            }
+            catch (ArgumentException ex)
+            {
+                //TODO: Check the string is nasty. Validation on the size of the array being sent should be done earlier anyway
+                if (ex.Message == "Value does not fall within the expected range.")
+                {
+                    throw new Exception("It seems that the data being sent to the device does not match the accepted size. Have you checked DataHasExtraByte?", ex);
+                }
+            }
 
             Tracer?.Trace(false, bytes);
 
