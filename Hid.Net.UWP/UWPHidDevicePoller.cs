@@ -44,16 +44,17 @@ namespace Hid.Net.UWP
             try
             {
                 var foundDeviceInformations = await GetDevicesByIdSlowAsync();
+                UWPHidDevice.DeviceId = foundDeviceInformations.FirstOrDefault().Id;
 
-                if (UWPHidDevice.WindowsDeviceInformationList == null && (foundDeviceInformations.Count > 0))
-                {
-                    UWPHidDevice.WindowsDeviceInformationList = foundDeviceInformations;
-                }
+                //if (UWPHidDevice.WindowsDeviceInformationList == null && (foundDeviceInformations.Count > 0))
+                //{
+                //    UWPHidDevice.WindowsDeviceInformationList = foundDeviceInformations;
+                //}
 
-                if (UWPHidDevice.WindowsDeviceInformationList != null && (foundDeviceInformations.Count == 0))
-                {
-                    UWPHidDevice.WindowsDeviceInformationList = null;
-                }
+                //if (UWPHidDevice.WindowsDeviceInformationList != null && (foundDeviceInformations.Count == 0))
+                //{
+                //    UWPHidDevice.WindowsDeviceInformationList = null;
+                //}
             }
             catch (Exception ex)
             {
@@ -81,13 +82,13 @@ namespace Hid.Net.UWP
 
             var filteredDevices = allDevices.Where(args => args.Id.ToLower().Contains(vendorIdString) && args.Id.ToLower().Contains(productIdString) && args.IsEnabled).ToList();
 
-            foreach(var deviceInformation in filteredDevices)
-            {
-                foreach(var keyValuePair in deviceInformation.Properties)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Key: {keyValuePair.Key} Value: {keyValuePair.Value}");
-                }
-            }
+            //foreach(var deviceInformation in filteredDevices)
+            //{
+            //    foreach(var keyValuePair in deviceInformation.Properties)
+            //    {
+            //        System.Diagnostics.Debug.WriteLine($"Key: {keyValuePair.Key} Value: {keyValuePair.Value}");
+            //    }
+            //}
 
             return filteredDevices;
         }
