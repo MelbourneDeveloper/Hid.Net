@@ -16,11 +16,6 @@ namespace Hid.Net.Android
         private UsbEndpoint _WriteEndpoint;
         private UsbEndpoint _ReadEndpoint;
         private bool _IsInitializing;
-
-        /// <summary>
-        /// Just used as a filter for the UsbPermissionBroadcastReceiver
-        /// </summary>
-        private const string RequestUsbIntentAction = nameof(RequestUsbIntentAction);
         #endregion
 
         #region Public Constants
@@ -73,12 +68,12 @@ namespace Hid.Net.Android
                     return _UsbDeviceConnection != null;
                 }
 
-                Logger.Log($"Android Hid device is connected", null, LogSection);
+                Logger.Log("Android Hid device is connected", null, LogSection);
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.Log($"Error getting IsConnected on Android device", ex, LogSection);
+                Logger.Log("Error getting IsConnected on Android device", ex, LogSection);
                 throw;
             }
         }
@@ -163,7 +158,7 @@ namespace Hid.Net.Android
         {
             var devices = UsbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
-            Logger.Log($"Connected devices: {(string.Join(",", devices.Select(d => d.VendorId)))}.", null, LogSection);
+            Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => d.VendorId))}.", null, LogSection);
 
             _UsbDevice?.Dispose();
             _UsbDevice = devices.FirstOrDefault(d => d.VendorId == VendorId && d.ProductId == ProductId);
@@ -172,7 +167,7 @@ namespace Hid.Net.Android
             {
                 if (_UsbDeviceConnection == null)
                 {
-                    Logger.Log($"Initializing Android Hid device", null, LogSection);
+                    Logger.Log("Initializing Android Hid device", null, LogSection);
                     await InitializeAsync();
                 }
             }
@@ -233,7 +228,7 @@ namespace Hid.Net.Android
 
                 var usbInterface = _UsbDevice.GetInterface(0);
 
-                //TODO: This selection stuff needs to be moved up higher. The contructor should take these arguments
+                //TODO: This selection stuff needs to be moved up higher. The constructor should take these arguments
                 for (var i = 0; i < usbInterface.EndpointCount; i++)
                 {
                     var ep = usbInterface.GetEndpoint(i);
