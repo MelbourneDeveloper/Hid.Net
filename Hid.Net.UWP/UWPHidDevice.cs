@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Storage;
+using wde = Windows.Devices.Enumeration;
 
 namespace Hid.Net.UWP
 {
@@ -18,13 +21,13 @@ namespace Hid.Net.UWP
         private HidDevice _HidDevice;
         private TaskCompletionSource<byte[]> _TaskCompletionSource = null;
         private readonly Collection<byte[]> _Chunks = new Collection<byte[]>();
-
-        public int VendorId => _HidDevice.VendorId;
-        public int ProductId => _HidDevice.ProductId;
         private bool _IsReading;
         #endregion
 
         #region Public Properties
+        public int VendorId { get; set; }
+        public int ProductId { get; set; }
+
         public string DeviceId { get; set; }
         public bool DataHasExtraByte { get; set; } = true;
         #endregion
@@ -78,6 +81,15 @@ namespace Hid.Net.UWP
         {
             DeviceId = deviceId;
         }
+
+        /// <summary>
+        /// TODO: Further filter by UsagePage. The problem is that this syntax never seems to work: AND System.DeviceInterface.Hid.UsagePage:=?? 
+        /// </summary>
+        public UWPHidDevice(int vendorId, int productId)
+        {
+            VendorId = vendorId;
+            ProductId = productId;
+        }
         #endregion
 
         #region Private Methods
@@ -88,12 +100,24 @@ namespace Hid.Net.UWP
             //TODO: Dispose but this seems to cause initialization to never occur
             //Dispose();
 
+            Logger.Log("Initializing Hid device", null, nameof(UWPHidDevice));
+
             if (string.IsNullOrEmpty(DeviceId))
             {
-                throw new Exception($"{nameof(DeviceInformation)} has not been initialized");
-            }
+                var foundDevices = ((IEnumerable<wde.DeviceInformation>)await wde.DeviceInformation.FindAllAsync($"System.Devices.InterfaceEnabled:=System.StructuredQueryType.Boolean#True AND System.DeviceInterface.Hid.VendorId:={VendorId} AND System.DeviceInterface.Hid.ProductId:={ProductId} ").AsTask()).ToList();
 
-            Logger.Log("Initializing Hid device", null, nameof(UWPHidDevice));
+                if (foundDevices.Count == 0)
+                {
+                    throw new Exception($"There were no enabled devices connected with the ProductId of {ProductId} and VendorId of {VendorId}");
+                }
+
+                if (foundDevices.Count > 1)
+                {
+                    throw new Exception($"There was more than one device connected with the ProductId of {ProductId} and VendorId of {VendorId}");
+                }
+
+                DeviceId = foundDevices.First().Id;
+            }
 
             var hidDeviceOperation = HidDevice.FromIdAsync(DeviceId, FileAccessMode.ReadWrite);
             var task = hidDeviceOperation.AsTask();
