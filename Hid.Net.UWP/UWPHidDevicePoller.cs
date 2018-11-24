@@ -18,16 +18,18 @@ namespace Hid.Net.UWP
         public int ProductId { get; }
         public int VendorId { get; }
         public UWPHidDevice UWPHidDevice { get; private set; }
+        public List<string> ExcludeIds { get; private set; }
         #endregion
 
         #region Constructor
-        public UWPHidDevicePoller(int productId, int vendorId, UWPHidDevice uwpHidDevice)
+        public UWPHidDevicePoller(int productId, int vendorId, List<string> excludeIds, UWPHidDevice uwpHidDevice)
         {
             _PollTimer.Elapsed += _PollTimer_Elapsed;
             _PollTimer.Start();
             ProductId = productId;
             VendorId = vendorId;
             UWPHidDevice = uwpHidDevice;
+            ExcludeIds = excludeIds;
         }
         #endregion
 
@@ -49,6 +51,11 @@ namespace Hid.Net.UWP
                 {
                     try
                     {
+                        if (ExcludeIds.Contains(deviceInformation.Id))
+                        {
+                            continue;
+                        }
+
                         //Attempt to connect and move to the next one if this one doesn't connect
                         UWPHidDevice.DeviceId = deviceInformation.Id;
                         await UWPHidDevice.InitializeAsync();
@@ -58,9 +65,9 @@ namespace Hid.Net.UWP
                             break;
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-
+                        Logger.Log("Error connecting to device", ex, nameof(UWPHidDevicePoller));
                     }
                 }
             }

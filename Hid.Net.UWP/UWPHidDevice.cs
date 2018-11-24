@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
+using Windows.Storage;
 
 namespace Hid.Net.UWP
 {
@@ -94,7 +95,7 @@ namespace Hid.Net.UWP
 
             Logger.Log("Initializing Hid device", null, nameof(UWPHidDevice));
 
-            var hidDeviceOperation = HidDevice.FromIdAsync(DeviceId, Windows.Storage.FileAccessMode.ReadWrite);
+            var hidDeviceOperation = HidDevice.FromIdAsync(DeviceId, FileAccessMode.ReadWrite);
             var task = hidDeviceOperation.AsTask();
             _HidDevice = await task;
 
