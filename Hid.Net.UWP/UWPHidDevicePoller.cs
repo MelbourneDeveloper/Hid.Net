@@ -44,17 +44,25 @@ namespace Hid.Net.UWP
             try
             {
                 var foundDeviceInformations = await GetDevicesByIdSlowAsync();
-                UWPHidDevice.DeviceId = foundDeviceInformations.FirstOrDefault().Id;
 
-                //if (UWPHidDevice.WindowsDeviceInformationList == null && (foundDeviceInformations.Count > 0))
-                //{
-                //    UWPHidDevice.WindowsDeviceInformationList = foundDeviceInformations;
-                //}
+                foreach (var deviceInformation in foundDeviceInformations)
+                {
+                    try
+                    {
+                        //Attempt to connect and move to the next one if this one doesn't connect
+                        UWPHidDevice.DeviceId = deviceInformation.Id;
+                        await UWPHidDevice.InitializeAsync();
+                        if (await UWPHidDevice.GetIsConnectedAsync())
+                        {
+                            //Connection was successful
+                            break;
+                        }
+                    }
+                    catch(Exception ex)
+                    {
 
-                //if (UWPHidDevice.WindowsDeviceInformationList != null && (foundDeviceInformations.Count == 0))
-                //{
-                //    UWPHidDevice.WindowsDeviceInformationList = null;
-                //}
+                    }
+                }
             }
             catch (Exception ex)
             {
