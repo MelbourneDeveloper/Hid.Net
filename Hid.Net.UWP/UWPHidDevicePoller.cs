@@ -18,18 +18,16 @@ namespace Hid.Net.UWP
         public int ProductId { get; }
         public int VendorId { get; }
         public UWPHidDevice UWPHidDevice { get; private set; }
-        public List<string> ExcludeIds { get; private set; }
         #endregion
 
         #region Constructor
-        public UWPHidDevicePoller(int productId, int vendorId, List<string> excludeIds, UWPHidDevice uwpHidDevice)
+        public UWPHidDevicePoller(int productId, int vendorId, UWPHidDevice uwpHidDevice)
         {
             _PollTimer.Elapsed += _PollTimer_Elapsed;
             _PollTimer.Start();
             ProductId = productId;
             VendorId = vendorId;
             UWPHidDevice = uwpHidDevice;
-            ExcludeIds = excludeIds;
         }
         #endregion
 
@@ -51,11 +49,6 @@ namespace Hid.Net.UWP
                 {
                     try
                     {
-                        if (ExcludeIds.Contains(deviceInformation.Id))
-                        {
-                            continue;
-                        }
-
                         //Attempt to connect and move to the next one if this one doesn't connect
                         UWPHidDevice.DeviceId = deviceInformation.Id;
                         await UWPHidDevice.InitializeAsync();
@@ -95,7 +88,7 @@ namespace Hid.Net.UWP
             var vendorIdString = $"VID_{ VendorId.ToString("X").PadLeft(4, '0')}".ToLower();
             var productIdString = $"PID_{ ProductId.ToString("X").PadLeft(4, '0')}".ToLower();
 
-            var filteredDevices = allDevices.Where(args => args.Id.ToLower().Contains(vendorIdString) && args.Id.ToLower().Contains(productIdString) && args.IsEnabled).ToList();
+            var filteredDevices = allDevices.Where(args => args.Id.StartsWith(@"\\?\HID") && args.Id.ToLower().Contains(vendorIdString) && args.Id.ToLower().Contains(productIdString) && args.IsEnabled).ToList();
 
             //foreach(var deviceInformation in filteredDevices)
             //{
