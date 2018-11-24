@@ -42,7 +42,7 @@ namespace Hid.Net.UWP
 
             try
             {
-                var foundDeviceInformations = await GetDevicesAsync();
+                var foundDeviceInformations = await UWPHelpers.GetDevicesByProductAndVendorAsync(VendorId, ProductId);
 
                 foreach (var deviceInformation in foundDeviceInformations)
                 {
@@ -69,14 +69,6 @@ namespace Hid.Net.UWP
             }
 
             _IsPolling = false;
-        }
-        #endregion
-
-        #region Private Methods
-        private async Task<List<wde.DeviceInformation>> GetDevicesAsync()
-        {
-            var filteredDevices = await UWPHelpers.GetDevicesByProductAndVendorAsync(VendorId, ProductId);
-            return filteredDevices;
         }
         #endregion
 
