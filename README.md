@@ -38,3 +38,8 @@ Litecoin: MVAbLaNPq7meGXvZMU4TwypUsDEuU6stpY
 ## Contribution
 
 Contribution is welcome. Please fork, tighten up the code (real tight), test, and submit a pull request.
+
+## Useful Resources
+
+UWP Permissions (they are a real pain)
+http://www.idevstream.com/?p=322
