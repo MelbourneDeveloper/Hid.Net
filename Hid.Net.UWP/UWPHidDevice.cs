@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
@@ -111,31 +110,52 @@ namespace Hid.Net.UWP
                     throw new Exception($"There were no enabled devices connected with the ProductId of {ProductId} and VendorId of {VendorId}");
                 }
 
-                if (foundDevices.Count > 1)
+                foreach (var deviceInformation in foundDevices)
                 {
-                    throw new Exception($"There was more than one device connected with the ProductId of {ProductId} and VendorId of {VendorId}");
+                    try
+                    {
+                        //Attempt to connect
+                        Logger.Log($"Attempting to connect to device Id {deviceInformation.Id} ...", null, nameof(UWPHidDevice));
+
+                        var hidDevice = await GetDevice(deviceInformation.Id);
+
+                        if (hidDevice != null)
+                        {
+                            _HidDevice = hidDevice;
+                            //Connection was successful
+                            DeviceId = deviceInformation.Id;
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Error attempting to connect to {deviceInformation.Id}", ex, nameof(UWPHidDevice));
+                    }
                 }
 
-                DeviceId = foundDevices.First().Id;
+                if (string.IsNullOrEmpty(DeviceId))
+                {
+                    throw new Exception($"Attempted to connect to {foundDevices.Count} devices, but they all failed to connect");
+                }
+            }
+            else
+            {
+                _HidDevice = await GetDevice(DeviceId);
             }
 
-            var hidDeviceOperation = HidDevice.FromIdAsync(DeviceId, FileAccessMode.ReadWrite);
+            if (_HidDevice != null)
+            {
+                _HidDevice.InputReportReceived += _HidDevice_InputReportReceived;
+                Connected?.Invoke(this, new EventArgs());
+            }
+        }
+
+        private static async Task<HidDevice> GetDevice(string id)
+        {
+            var hidDeviceOperation = HidDevice.FromIdAsync(id, FileAccessMode.ReadWrite);
             var task = hidDeviceOperation.AsTask();
-            _HidDevice = await task;
-
-            if (_HidDevice == null)
-            {
-                throw new Exception($"Could not obtain a connection to the device.");
-            }
-
-            _HidDevice.InputReportReceived += _HidDevice_InputReportReceived;
-
-            if (_HidDevice == null)
-            {
-                throw new Exception("Could not connect to the device");
-            }
-
-            Connected?.Invoke(this, new EventArgs());
+            var hidDevice = await task;
+            return hidDevice;
         }
         #endregion
 

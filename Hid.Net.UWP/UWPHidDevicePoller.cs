@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Timers;
-using wde = Windows.Devices.Enumeration;
 
 namespace Hid.Net.UWP
 {
@@ -48,6 +45,12 @@ namespace Hid.Net.UWP
                 {
                     try
                     {
+
+                        //foreach (var keyValuePair in deviceInformation.Properties)
+                        //{
+                        //    System.Diagnostics.Debug.WriteLine($"Key: {keyValuePair.Key} Value: {keyValuePair.Value}");
+                        //}
+
                         //Attempt to connect and move to the next one if this one doesn't connect
                         UWPHidDevice.DeviceId = deviceInformation.Id;
                         await UWPHidDevice.InitializeAsync();
