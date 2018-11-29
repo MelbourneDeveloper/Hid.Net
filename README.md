@@ -19,13 +19,13 @@ Currently supports:
 
 ## Samples & Unit Tests
 
-https://github.com/MelbourneDeveloper/Trezor.Net (UWP, Console - .NET Framework)
+https://github.com/MelbourneDeveloper/Trezor.Net (UWP, Android, Console - .NET Framework)
 
-https://github.com/MelbourneDeveloper/Ledger.Net (Console - .NET Core)
+https://github.com/MelbourneDeveloper/Ledger.Net (UWP, Console - .NET Core)
 
 https://github.com/LedgerHQ/ledger-dotnet-api (Console - .NET Core)
 
-https://github.com/MelbourneDeveloper/KeepKey.Net (.NET Framework)
+https://github.com/MelbourneDeveloper/KeepKey.Net (UWP, .NET Framework)
 
 ## Store App Production Usage
 
