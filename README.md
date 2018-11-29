@@ -1,5 +1,6 @@
 # Hid.Net
 Cross platform C# library for talking to HID devices in a uniform way through dependency injection.
+
 Join us on Slack:
 https://hardwarewallets.slack.com
 
