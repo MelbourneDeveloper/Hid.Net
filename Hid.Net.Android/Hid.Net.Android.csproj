@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AndroidDeviceEnumerator.cs" />
-    <Compile Include="IHidDeviceEnumerator.cs" />
     <Compile Include="UsbDeviceAttachedReceiver.cs" />
     <Compile Include="UsbDeviceDetachedReceiver.cs" />
     <Compile Include="UsbPermissionBroadcastReceiver.cs" />
