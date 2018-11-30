@@ -23,47 +23,42 @@ namespace Hid.Net.Android
         #endregion
 
         #region Implementation
-        public async Task<List<DeviceInformation>> GetDeviceInformationListAsync(IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
+        public async Task<List<DeviceInformation>> GetDeviceInformationListAsync(DeviceQuery deviceQuery)
         {
             return await Task.Run(() =>
             {
-                return GetDeviceInformationList(UsbManager, filterVendorIdAndProductIds);
+                return GetDeviceInformationList(UsbManager, deviceQuery);
             });
         }
 
-        public Task<AndroidHidDevice> GetFirstDeviceAsync(IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<AndroidHidDevice> GetDeviceAsync(string deviceId)
+        public Task<AndroidHidDevice> GetFirstDeviceAsync(DeviceQuery deviceQuery)
         {
             throw new System.NotImplementedException();
         }
         #endregion
 
         #region Private Static Methods
-        private static List<DeviceInformation> GetDeviceInformationList(UsbManager usbManager, IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
+        private static List<DeviceInformation> GetDeviceInformationList(UsbManager usbManager, DeviceQuery deviceQuery)
         {
-            var usbDevices = GetUsbDevices(usbManager, filterVendorIdAndProductIds);
+            var usbDevices = GetUsbDevices(usbManager, deviceQuery);
 
             return usbDevices.Select(d => new DeviceInformation { DeviceId = d.DeviceId.ToString(), VendorId = d.VendorId, ProductId = d.ProductId, SerialNumber = d.SerialNumber }).ToList();
         }
 
-        private static IEnumerable<UsbDevice> GetUsbDevices(UsbManager usbManager, IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
+        private static IEnumerable<UsbDevice> GetUsbDevices(UsbManager usbManager, DeviceQuery deviceQuery )
         {
             var devices = usbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
             Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
 
-            return devices.Where(d => filterVendorIdAndProductIds.Any(vp => (vp.VendorId == d.VendorId) && (vp.ProductId == d.ProductId)));
+            return devices.Where(d => deviceQuery.VendorProductIdPairs.Any(vp => (vp.VendorId == d.VendorId) && (vp.ProductId == d.ProductId)));
         }
         #endregion
 
         #region Public Static Methods
-        public static UsbDevice GetFirstUsbDevice(UsbManager usbManager, IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
+        public static UsbDevice GetFirstUsbDevice(UsbManager usbManager, DeviceQuery deviceQuery)
         {
-            return GetUsbDevices(usbManager, filterVendorIdAndProductIds).FirstOrDefault();
+            return GetUsbDevices(usbManager, deviceQuery).FirstOrDefault();
         }
         #endregion
     }

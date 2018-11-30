@@ -155,7 +155,7 @@ namespace Hid.Net.Android
 
         private async Task CheckForDeviceAsync()
         {
-            _UsbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, DeviceQuery.VendorProductIdPairs);
+            _UsbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, DeviceQuery);
 
             if (_UsbDevice != null)
             {

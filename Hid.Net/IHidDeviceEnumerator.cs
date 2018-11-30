@@ -5,8 +5,7 @@ namespace Hid.Net
 {
     public interface IHidDeviceEnumerator<T> where T : IHidDevice
     {
-        Task<List<DeviceInformation>> GetDeviceInformationListAsync(IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds);
-        Task<T> GetFirstDeviceAsync(IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds);
-        Task<T> GetDeviceAsync(string deviceId);
+        Task<List<DeviceInformation>> GetDeviceInformationListAsync(DeviceQuery deviceQuery);
+        Task<T> GetFirstDeviceAsync(DeviceQuery deviceQuery);
     }
 }
