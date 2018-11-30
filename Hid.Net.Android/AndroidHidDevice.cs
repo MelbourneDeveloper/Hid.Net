@@ -46,10 +46,6 @@ namespace Hid.Net.Android
             ReadBufferLength = readBufferLength;
             VendorId = vendorId;
             ProductId = productId;
-
-            //TODO: Remove this. The device needs to be initialized properly
-            //Check to see if the device is connected asynchronously.
-            CheckForDeviceAsync();
         }
         #endregion
 
@@ -214,6 +210,8 @@ namespace Hid.Net.Android
             {
                 //TODO:
                 //Dispose();
+
+                await CheckForDeviceAsync();
 
                 var isPermissionGranted = await RequestPermissionAsync();
                 if (!isPermissionGranted.HasValue)
