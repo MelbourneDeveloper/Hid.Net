@@ -154,7 +154,9 @@ namespace Hid.Net.Android
         {
             var devices = UsbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
-            Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => d.VendorId))}.", null, LogSection);
+            Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
+
+            UsbManager.
 
             _UsbDevice?.Dispose();
             _UsbDevice = devices.FirstOrDefault(d => d.VendorId == VendorId && d.ProductId == ProductId);
