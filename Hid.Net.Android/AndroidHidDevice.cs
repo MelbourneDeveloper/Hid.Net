@@ -99,10 +99,29 @@ namespace Hid.Net.Android
 
         public void Dispose()
         {
-            _UsbDeviceConnection?.Dispose();
+            var wasConnected = _UsbDeviceConnection != null;
+
+            if (wasConnected)
+            {
+                Logger.Log("Disconnecting previously connected device...", null, LogSection);
+                _UsbDeviceConnection?.Dispose();
+            }
+
             _UsbDevice?.Dispose();
-            _ReadEndpoint?.Dispose();
             _WriteEndpoint?.Dispose();
+            _ReadEndpoint?.Dispose();
+            _UsbDevice?.Dispose();
+
+            _UsbDeviceConnection = null;
+            _UsbDevice = null;
+            _WriteEndpoint = null;
+            _ReadEndpoint = null;
+            _UsbDevice = null;
+
+            if (wasConnected)
+            {
+                Disconnected?.Invoke(this, new EventArgs());
+            }
         }
 
         //TODO: Make async properly
@@ -156,52 +175,6 @@ namespace Hid.Net.Android
                 throw new IOException(Helpers.WriteErrorMessage, ex);
             }
         }
-
-        #endregion
-
-        #region Private  Methods
-
-        private async Task CheckForDeviceAsync()
-        {
-            _UsbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, DeviceQuery);
-
-            if (_UsbDevice != null)
-            {
-                if (_UsbDeviceConnection == null)
-                {
-                    Logger.Log("Initializing Android Hid device", null, LogSection);
-                    await InitializeAsync();
-                }
-            }
-            else
-            {
-                var wasConnected = _UsbDeviceConnection != null;
-                _UsbDeviceConnection?.Dispose();
-                _UsbDeviceConnection = null;
-                if (wasConnected)
-                {
-                    Disconnected?.Invoke(this, new EventArgs());
-                }
-            }
-        }
-
-        private Task<bool?> RequestPermissionAsync()
-        {
-            Logger.Log("Requesting USB permission", null, LogSection);
-
-            var taskCompletionSource = new TaskCompletionSource<bool?>();
-
-            var usbPermissionBroadcastReceiver = new UsbPermissionBroadcastReceiver(UsbManager, _UsbDevice, AndroidContext);
-            usbPermissionBroadcastReceiver.Received += (sender, eventArgs) =>
-            {
-                taskCompletionSource.SetResult(usbPermissionBroadcastReceiver.IsPermissionGranted);
-            };
-
-            usbPermissionBroadcastReceiver.Register();
-
-            return taskCompletionSource.Task;
-        }
-
         public async Task InitializeAsync()
         {
             //TODO: Use a semaphore lock here
@@ -214,8 +187,7 @@ namespace Hid.Net.Android
 
             try
             {
-                //TODO:
-                //Dispose();
+                Logger.Log("Initializing Android Hid device", null, LogSection);
 
                 await CheckForDeviceAsync();
 
@@ -295,6 +267,43 @@ namespace Hid.Net.Android
             }
 
             _IsInitializing = false;
+        }
+        #endregion
+
+        #region Private  Methods
+        private async Task CheckForDeviceAsync()
+        {
+            var usbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, DeviceQuery);
+
+            if (usbDevice == null)
+            {
+                Dispose();
+            }
+            else
+            {
+                if (_UsbDevice.DeviceId != usbDevice.DeviceId)
+                {
+                    Dispose();
+                    _UsbDevice = usbDevice;
+                }
+            }
+        }
+
+        private Task<bool?> RequestPermissionAsync()
+        {
+            Logger.Log("Requesting USB permission", null, LogSection);
+
+            var taskCompletionSource = new TaskCompletionSource<bool?>();
+
+            var usbPermissionBroadcastReceiver = new UsbPermissionBroadcastReceiver(UsbManager, _UsbDevice, AndroidContext);
+            usbPermissionBroadcastReceiver.Received += (sender, eventArgs) =>
+            {
+                taskCompletionSource.SetResult(usbPermissionBroadcastReceiver.IsPermissionGranted);
+            };
+
+            usbPermissionBroadcastReceiver.Register();
+
+            return taskCompletionSource.Task;
         }
         #endregion
     }
