@@ -18,13 +18,16 @@ namespace Hid.Net.Android
         #region Implementation
         public async Task<List<DeviceInformation>> GetDeviceInformationList(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
         {
-            var devices = UsbManager.DeviceList.Select(kvp => kvp.Value).ToList();
+            return await Task.Run(() =>
+            {
+                var devices = UsbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
-            Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
+                Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
 
-            var usbDevices = devices.Where(d => filterVendorIdAndProductIds.Any(o => (o.VendorId == d.VendorId) && (o.ProductId == d.ProductId)));
+                var usbDevices = devices.Where(d => filterVendorIdAndProductIds.Any(o => (o.VendorId == d.VendorId) && (o.ProductId == d.ProductId)));
 
-            return usbDevices.Select(d => new DeviceInformation { DeviceId = d.DeviceId.ToString() }).ToList();
+                return usbDevices.Select(d => new DeviceInformation { DeviceId = d.DeviceId.ToString() }).ToList();
+            });
         }
 
         public Task<IHidDevice> GetFirstDevice(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
