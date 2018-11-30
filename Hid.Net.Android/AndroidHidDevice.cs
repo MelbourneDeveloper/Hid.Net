@@ -42,6 +42,14 @@ namespace Hid.Net.Android
         {
         }
 
+        /// <summary>
+        /// Initializes and Android device based on DeviceQuery. To ensure uniqueness, please specify DeviceId in the query. Otherwise, the first found device will be connected to. Please see AndroidDeviceEnumerator for enumeration utilities.
+        /// </summary>
+        /// <param name="usbManager"></param>
+        /// <param name="androidContext"></param>
+        /// <param name="timeoutMilliseconds"></param>
+        /// <param name="readBufferLength"></param>
+        /// <param name="deviceQuery">The query used to filter down the list of connected devices</param>
         public AndroidHidDevice(UsbManager usbManager, Context androidContext, int timeoutMilliseconds, int readBufferLength, DeviceQuery deviceQuery)
         {
             UsbManager = usbManager;
