@@ -1,11 +1,11 @@
 ﻿namespace Hid.Net
 {
-    public class VendorIdAndProductId
+    public class VendorProductIdPair
     {
         public int VendorId { get; }
         public int ProductId { get; }
 
-        public VendorIdAndProductId(int vendorId, int productId)
+        public VendorProductIdPair(int vendorId, int productId)
         {
             VendorId = vendorId;
             ProductId = productId;

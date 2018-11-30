@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Hid.Net.Android
 {
-    public class AndroidDeviceEnumerator : IHidDeviceEnumerator
+    public class AndroidDeviceEnumerator : IHidDeviceEnumerator<AndroidHidDevice>
     {
         #region Public Properties
         public UsbManager UsbManager { get; }
@@ -23,7 +23,7 @@ namespace Hid.Net.Android
         #endregion
 
         #region Implementation
-        public async Task<List<DeviceInformation>> GetDeviceInformationListAsync(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        public async Task<List<DeviceInformation>> GetDeviceInformationListAsync(IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
         {
             return await Task.Run(() =>
             {
@@ -31,26 +31,26 @@ namespace Hid.Net.Android
             });
         }
 
-        public Task<IHidDevice> GetFirstDeviceAsync(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        public Task<AndroidHidDevice> GetFirstDeviceAsync(IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<IHidDevice> GetDeviceAsync(string deviceId)
+        public Task<AndroidHidDevice> GetDeviceAsync(string deviceId)
         {
             throw new System.NotImplementedException();
         }
         #endregion
 
         #region Private Static Methods
-        private static List<DeviceInformation> GetDeviceInformationList(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        private static List<DeviceInformation> GetDeviceInformationList(UsbManager usbManager, IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
         {
             var usbDevices = GetUsbDevices(usbManager, filterVendorIdAndProductIds);
 
             return usbDevices.Select(d => new DeviceInformation { DeviceId = d.DeviceId.ToString(), VendorId = d.VendorId, ProductId = d.ProductId, SerialNumber = d.SerialNumber }).ToList();
         }
 
-        private static IEnumerable<UsbDevice> GetUsbDevices(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        private static IEnumerable<UsbDevice> GetUsbDevices(UsbManager usbManager, IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
         {
             var devices = usbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
@@ -61,7 +61,7 @@ namespace Hid.Net.Android
         #endregion
 
         #region Public Static Methods
-        public static UsbDevice GetFirstUsbDevice(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        public static UsbDevice GetFirstUsbDevice(UsbManager usbManager, IEnumerable<VendorProductIdPair> filterVendorIdAndProductIds)
         {
             return GetUsbDevices(usbManager, filterVendorIdAndProductIds).FirstOrDefault();
         }

@@ -28,7 +28,7 @@ namespace Hid.Net.Android
         public int ReadBufferLength { get; }
         public int VendorId => _UsbDevice != null ? _UsbDevice.VendorId : 0;
         public int ProductId => _UsbDevice != null ? _UsbDevice.ProductId : 0;
-        //IEnumerable<VendorIdAndProductId> Filter
+        public DeviceQuery DeviceQuery { get; }
         public bool IsInitialized { get; private set; }
         #endregion
 
@@ -38,12 +38,17 @@ namespace Hid.Net.Android
         #endregion
 
         #region Constructor
-        public AndroidHidDevice(UsbManager usbManager, Context androidContext, int timeoutMilliseconds, int readBufferLength, int vendorId, int productId)
+        public AndroidHidDevice(UsbManager usbManager, Context androidContext, int timeoutMilliseconds, int readBufferLength, int vendorId, int productId) : this(usbManager, androidContext, timeoutMilliseconds, readBufferLength, new DeviceQuery { VendorProductIdPairs = { new VendorProductIdPair(vendorId, productId) } })
+        {
+        }
+
+        public AndroidHidDevice(UsbManager usbManager, Context androidContext, int timeoutMilliseconds, int readBufferLength, DeviceQuery deviceQuery)
         {
             UsbManager = usbManager;
             AndroidContext = androidContext;
             TimeoutMilliseconds = timeoutMilliseconds;
             ReadBufferLength = readBufferLength;
+            DeviceQuery = deviceQuery;
         }
         #endregion
 
@@ -150,7 +155,7 @@ namespace Hid.Net.Android
 
         private async Task CheckForDeviceAsync()
         {
-            _UsbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, )
+            _UsbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, DeviceQuery.VendorProductIdPairs);
 
             if (_UsbDevice != null)
             {
