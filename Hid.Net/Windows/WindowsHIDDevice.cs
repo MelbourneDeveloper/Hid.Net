@@ -31,7 +31,7 @@ namespace Hid.Net
         #region Public Properties
         public bool DataHasExtraByte { get; set; } = true;
         public DeviceInformation DeviceInformation { get; set; }
-        public string DevicePath => DeviceInformation.DevicePath;
+        public string DevicePath => DeviceInformation.DeviceId;
         public bool IsInitialized { get; private set; }
         public int ProductId => DeviceInformation.ProductId;
         public ushort Usage => _HidCollectionCapabilities.Usage;
@@ -149,8 +149,8 @@ namespace Hid.Net
             _HidCollectionCapabilities = new HidCollectionCapabilities();
             var pointerToBuffer = Marshal.AllocHGlobal(126);
 
-            _ReadSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
-            _WriteSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
+            _ReadSafeFileHandle = APICalls.CreateFile(DeviceInformation.DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
+            _WriteSafeFileHandle = APICalls.CreateFile(DeviceInformation.DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
 
             if (!APICalls.HidD_GetPreparsedData(_ReadSafeFileHandle, ref pointerToPreParsedData))
             {
@@ -324,7 +324,7 @@ namespace Hid.Net
 
                 var deviceInformation = new DeviceInformation
                 {
-                    DevicePath = devicePath,
+                    DeviceId = devicePath,
                     InputReportByteLength = hidCollectionCapabilities.InputReportByteLength,
                     Manufacturer = manufacturer,
                     OutputReportByteLength = hidCollectionCapabilities.OutputReportByteLength,

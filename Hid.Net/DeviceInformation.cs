@@ -2,7 +2,7 @@
 {
     public class DeviceInformation
     {
-        public string DevicePath { get; set; }
+        public string DeviceId { get; set; }
         public int InputReportByteLength { get; set; }
         public string Manufacturer { get; set; }
         public int OutputReportByteLength { get; set; }
