@@ -5,6 +5,8 @@ namespace Hid.Net
 {
     public interface IHidDeviceEnumerator
     {
-        Task<IEnumerable<string>> GetDeviceIds(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds);
+        Task<IList<DeviceInformation>> GetDeviceInformationList(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds);
+        Task<IHidDevice> GetFirstDevice(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds);
+        Task<IHidDevice> GetDevice(string deviceId);
     }
 }

@@ -16,11 +16,26 @@ namespace Hid.Net.Android
         #endregion
 
         #region Implementation
-        public Task<IEnumerable<string>> GetDeviceIds(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        public Task<IList<DeviceInformation>> GetDeviceIds(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
         {
             var devices = UsbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
             Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
+        }
+
+        public Task<IList<DeviceInformation>> GetDeviceInformationList(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IHidDevice> GetFirstDevice(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<IHidDevice> GetDevice(string deviceId)
+        {
+            throw new System.NotImplementedException();
         }
 
         public AndroidDeviceEnumerator(UsbManager usbManager)
