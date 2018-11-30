@@ -56,7 +56,7 @@ namespace Hid.Net.Android
 
             Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
 
-            return devices.Where(d => filterVendorIdAndProductIds.Any(o => (o.VendorId == d.VendorId) && (o.ProductId == d.ProductId)));
+            return devices.Where(d => filterVendorIdAndProductIds.Any(vp => (vp.VendorId == d.VendorId) && (vp.ProductId == d.ProductId)));
         }
         #endregion
 

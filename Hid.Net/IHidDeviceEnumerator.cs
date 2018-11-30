@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 
 namespace Hid.Net
 {
-    public interface IHidDeviceEnumerator
+    public interface IHidDeviceEnumerator<T> where T : IHidDevice
     {
         Task<List<DeviceInformation>> GetDeviceInformationListAsync(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds);
-        Task<IHidDevice> GetFirstDeviceAsync(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds);
-        Task<IHidDevice> GetDeviceAsync(string deviceId);
+        Task<T> GetFirstDeviceAsync(IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds);
+        Task<T> GetDeviceAsync(string deviceId);
     }
 }

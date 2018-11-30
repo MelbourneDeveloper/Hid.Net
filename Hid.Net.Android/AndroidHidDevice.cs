@@ -3,7 +3,6 @@ using Android.Hardware.Usb;
 using Java.Nio;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hid.Net.Android
@@ -27,8 +26,9 @@ namespace Hid.Net.Android
         public Context AndroidContext { get; private set; }
         public int TimeoutMilliseconds { get; }
         public int ReadBufferLength { get; }
-        public int VendorId { get; }
-        public int ProductId { get; }
+        public int VendorId => _UsbDevice != null ? _UsbDevice.VendorId : 0;
+        public int ProductId => _UsbDevice != null ? _UsbDevice.ProductId : 0;
+        //IEnumerable<VendorIdAndProductId> Filter
         public bool IsInitialized { get; private set; }
         #endregion
 
@@ -44,8 +44,6 @@ namespace Hid.Net.Android
             AndroidContext = androidContext;
             TimeoutMilliseconds = timeoutMilliseconds;
             ReadBufferLength = readBufferLength;
-            VendorId = vendorId;
-            ProductId = productId;
         }
         #endregion
 
@@ -152,14 +150,7 @@ namespace Hid.Net.Android
 
         private async Task CheckForDeviceAsync()
         {
-            var devices = UsbManager.DeviceList.Select(kvp => kvp.Value).ToList();
-
-            Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
-
-            UsbManager.
-
-            _UsbDevice?.Dispose();
-            _UsbDevice = devices.FirstOrDefault(d => d.VendorId == VendorId && d.ProductId == ProductId);
+            _UsbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, )
 
             if (_UsbDevice != null)
             {
