@@ -30,7 +30,6 @@ namespace Hid.Net.Android
         public int VendorId => _UsbDevice != null ? _UsbDevice.VendorId : 0;
         public int ProductId => _UsbDevice != null ? _UsbDevice.ProductId : 0;
         public DeviceQuery DeviceQuery { get; }
-        public bool IsInitialized { get; private set; }
         #endregion
 
         #region Events
@@ -67,17 +66,8 @@ namespace Hid.Net.Android
         {
             try
             {
-                if (_UsbDeviceConnection == null)
-                {
-                    Logger.Log($"{nameof(_UsbDeviceConnection)} is null", null, LogSection);
-
-                    RefreshDevice();
-
-                    return _UsbDeviceConnection != null;
-                }
-
-                Logger.Log("Android Hid device is connected", null, LogSection);
-                return true;
+                RefreshDevice();
+                return _UsbDeviceConnection != null;
             }
             catch (Exception ex)
             {
@@ -176,6 +166,7 @@ namespace Hid.Net.Android
                 throw new IOException(Helpers.WriteErrorMessage, ex);
             }
         }
+
         public async Task InitializeAsync()
         {
             //Wait for existing initialization tasks
@@ -187,7 +178,10 @@ namespace Hid.Net.Android
 
                 RefreshDevice();
 
+                if (_UsbDevice == null) return;
+
                 var isPermissionGranted = await RequestPermissionAsync();
+
                 if (!isPermissionGranted.HasValue)
                 {
                     throw new Exception("User did not respond to permission request");
@@ -251,8 +245,6 @@ namespace Hid.Net.Android
 
                 Logger.Log("Hid device initialized. About to tell everyone.", null, LogSection);
 
-                IsInitialized = true;
-
                 Connected?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
@@ -273,10 +265,13 @@ namespace Hid.Net.Android
 
             if (usbDevice == null)
             {
+                Logger.Log("Hid device is not connected", null, LogSection);
                 Dispose();
             }
             else
             {
+                Logger.Log("Hid device is connected", null, LogSection);
+
                 if (_UsbDevice.DeviceId != usbDevice.DeviceId)
                 {
                     Dispose();
