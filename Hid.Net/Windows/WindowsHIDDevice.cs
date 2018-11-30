@@ -30,7 +30,7 @@ namespace Hid.Net
 
         #region Public Properties
         public bool DataHasExtraByte { get; set; } = true;
-        public DeviceInformation DeviceInformation { get; set; }
+        public WindowsDeviceInformation DeviceInformation { get; set; }
         public string DevicePath => DeviceInformation.DeviceId;
         public bool IsInitialized { get; private set; }
         public int ProductId => DeviceInformation.ProductId;
@@ -40,9 +40,9 @@ namespace Hid.Net
         #endregion
 
         #region Public Static Methods
-        public static Collection<DeviceInformation> GetConnectedDeviceInformations()
+        public static Collection<WindowsDeviceInformation> GetConnectedDeviceInformations()
         {
-            var deviceInformations = new Collection<DeviceInformation>();
+            var deviceInformations = new Collection<WindowsDeviceInformation>();
             var spDeviceInterfaceData = new SpDeviceInterfaceData();
             var spDeviceInfoData = new SpDeviceInfoData();
             var spDeviceInterfaceDetailData = new SpDeviceInterfaceDetailData();
@@ -103,7 +103,7 @@ namespace Hid.Net
         {
         }
 
-        public WindowsHidDevice(DeviceInformation deviceInformation) : this()
+        public WindowsHidDevice(WindowsDeviceInformation deviceInformation) : this()
         {
             DeviceInformation = deviceInformation;
         }
@@ -272,7 +272,7 @@ namespace Hid.Net
         #endregion
 
         #region Private Static Methods
-        private static DeviceInformation GetDeviceInformation(string devicePath)
+        private static WindowsDeviceInformation GetDeviceInformation(string devicePath)
         {
             using (var safeFileHandle = APICalls.CreateFile(devicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero))
             {
@@ -322,7 +322,7 @@ namespace Hid.Net
 
                 //TODO: Deal with issues here
 
-                var deviceInformation = new DeviceInformation
+                var deviceInformation = new WindowsDeviceInformation
                 {
                     DeviceId = devicePath,
                     InputReportByteLength = hidCollectionCapabilities.InputReportByteLength,
