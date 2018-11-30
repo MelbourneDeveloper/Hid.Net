@@ -42,16 +42,28 @@ namespace Hid.Net.Android
         }
         #endregion
 
-        #region Public Static Methods
-        public static List<DeviceInformation> GetDeviceInformationList(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        #region Private Static Methods
+        private static List<DeviceInformation> GetDeviceInformationList(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        {
+            var usbDevices = GetUsbDevices(usbManager, filterVendorIdAndProductIds);
+
+            return usbDevices.Select(d => new DeviceInformation { DeviceId = d.DeviceId.ToString(), VendorId = d.VendorId, ProductId = d.ProductId, SerialNumber = d.SerialNumber }).ToList();
+        }
+
+        private static IEnumerable<UsbDevice> GetUsbDevices(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
         {
             var devices = usbManager.DeviceList.Select(kvp => kvp.Value).ToList();
 
             Logger.Log($"Connected devices: {string.Join(",", devices.Select(d => $"Vid: {d.VendorId} Pid: {d.ProductId} Product Name: {d.ProductName} Serial Number: {d.SerialNumber} Device Id: {d.DeviceId}"))}", null, LogSection);
 
-            var usbDevices = devices.Where(d => filterVendorIdAndProductIds.Any(o => (o.VendorId == d.VendorId) && (o.ProductId == d.ProductId)));
+            return devices.Where(d => filterVendorIdAndProductIds.Any(o => (o.VendorId == d.VendorId) && (o.ProductId == d.ProductId)));
+        }
+        #endregion
 
-            return usbDevices.Select(d => new DeviceInformation { DeviceId = d.DeviceId.ToString(), VendorId = d.VendorId, ProductId = d.ProductId }).ToList();
+        #region Public Static Methods
+        public static UsbDevice GetFirstUsbDevice(UsbManager usbManager, IEnumerable<VendorIdAndProductId> filterVendorIdAndProductIds)
+        {
+            return GetUsbDevices(usbManager, filterVendorIdAndProductIds).FirstOrDefault();
         }
         #endregion
     }
