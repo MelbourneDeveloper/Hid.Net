@@ -1,6 +1,6 @@
 ﻿namespace Hid.Net
 {
-    public class WindowsDeviceInformation
+    public class WindowsDeviceInformation : DeviceInformation
     {
         public int InputReportByteLength { get; set; }
         public string Manufacturer { get; set; }
