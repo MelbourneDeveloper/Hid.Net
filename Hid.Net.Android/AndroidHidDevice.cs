@@ -71,7 +71,7 @@ namespace Hid.Net.Android
                 {
                     Logger.Log($"{nameof(_UsbDeviceConnection)} is null", null, LogSection);
 
-                    await CheckForDeviceAsync();
+                    RefreshDevice();
 
                     return _UsbDeviceConnection != null;
                 }
@@ -89,13 +89,13 @@ namespace Hid.Net.Android
         public async Task UsbDeviceAttached()
         {
             Logger.Log("Device attached", null, LogSection);
-            await CheckForDeviceAsync();
+            RefreshDevice();
         }
 
         public async Task UsbDeviceDetached()
         {
             Logger.Log("Device detached", null, LogSection);
-            await CheckForDeviceAsync();
+            RefreshDevice();
         }
 
         public void Dispose()
@@ -185,7 +185,7 @@ namespace Hid.Net.Android
             {
                 Logger.Log("Initializing Android Hid device", null, LogSection);
 
-                await CheckForDeviceAsync();
+                RefreshDevice();
 
                 var isPermissionGranted = await RequestPermissionAsync();
                 if (!isPermissionGranted.HasValue)
@@ -267,7 +267,7 @@ namespace Hid.Net.Android
         #endregion
 
         #region Private  Methods
-        private async Task CheckForDeviceAsync()
+        private void RefreshDevice()
         {
             var usbDevice = AndroidDeviceEnumerator.GetFirstUsbDevice(UsbManager, DeviceQuery);
 
