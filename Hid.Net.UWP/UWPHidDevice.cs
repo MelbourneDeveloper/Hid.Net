@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
+using Windows.Devices.Usb;
 using Windows.Foundation;
 using Windows.Storage;
 
@@ -17,7 +18,7 @@ namespace Hid.Net.UWP
         #endregion
 
         #region Fields
-        private HidDevice _HidDevice;
+        private UsbDevice _HidDevice;
         private TaskCompletionSource<byte[]> _TaskCompletionSource = null;
         private readonly Collection<byte[]> _Chunks = new Collection<byte[]>();
         private bool _IsReading;
@@ -150,9 +151,9 @@ namespace Hid.Net.UWP
             }
         }
 
-        private static async Task<HidDevice> GetDevice(string id)
+        private static async Task<UsbDevice> GetDevice(string id)
         {
-            var hidDeviceOperation = HidDevice.FromIdAsync(id, FileAccessMode.ReadWrite);
+            var hidDeviceOperation = UsbDevice.FromIdAsync(id);
             var task = hidDeviceOperation.AsTask();
             var hidDevice = await task;
             return hidDevice;
@@ -209,13 +210,25 @@ namespace Hid.Net.UWP
             }
 
             var buffer = bytes.AsBuffer();
-            var outReport = _HidDevice.CreateOutputReport();
-            outReport.Data = buffer;
-            IAsyncOperation<uint> operation = null;
 
             try
             {
-                operation = _HidDevice.SendOutputReportAsync(outReport);
+                var setupPacket = new UsbSetupPacket
+                {
+                    RequestType = new UsbControlRequestType
+                    {
+                        Direction = UsbTransferDirection.Out,
+                        Recipient = UsbControlRecipient.Device,
+                        ControlTransferType = UsbControlTransferType.Vendor
+                    },
+                    //Whats this then?
+                    //Request = SuperMutt.VendorCommand.SetLedBlinkPattern,
+                    //Value = pattern,
+                    Length = 0
+                };
+
+                var bytesTransferred = await _HidDevice.SendControlOutTransferAsync(setupPacket, buffer);
+
             }
             catch (ArgumentException ex)
             {
@@ -227,8 +240,6 @@ namespace Hid.Net.UWP
             }
 
             Tracer?.Trace(false, bytes);
-
-            await operation.AsTask();
         }
         #endregion
     }
