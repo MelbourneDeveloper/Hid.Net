@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
 using Windows.Devices.Usb;
-using Windows.Foundation;
-using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace Hid.Net.UWP
 {
@@ -19,9 +17,8 @@ namespace Hid.Net.UWP
 
         #region Fields
         private UsbDevice _HidDevice;
-        private TaskCompletionSource<byte[]> _TaskCompletionSource = null;
-        private readonly Collection<byte[]> _Chunks = new Collection<byte[]>();
-        private bool _IsReading;
+        private readonly bool _IsReading;
+        private IBuffer _LastReadData;
         #endregion
 
         #region Public Properties
@@ -33,26 +30,6 @@ namespace Hid.Net.UWP
         #endregion
 
         #region Event Handlers
-
-        private void _HidDevice_InputReportReceived(HidDevice sender, HidInputReportReceivedEventArgs args)
-        {
-            if (!_IsReading)
-            {
-                lock (_Chunks)
-                {
-                    var bytes = InputReportToBytes(args);
-                    _Chunks.Add(bytes);
-                }
-            }
-            else
-            {
-                var bytes = InputReportToBytes(args);
-
-                _IsReading = false;
-
-                _TaskCompletionSource.SetResult(bytes);
-            }
-        }
 
         private byte[] InputReportToBytes(HidInputReportReceivedEventArgs args)
         {
@@ -146,7 +123,6 @@ namespace Hid.Net.UWP
 
             if (_HidDevice != null)
             {
-                _HidDevice.InputReportReceived += _HidDevice_InputReportReceived;
                 Connected?.Invoke(this, new EventArgs());
             }
         }
@@ -169,30 +145,20 @@ namespace Hid.Net.UWP
         public void Dispose()
         {
             _HidDevice.Dispose();
-            _TaskCompletionSource?.Task?.Dispose();
         }
 
         public async Task<byte[]> ReadAsync()
         {
-            if (_IsReading)
+            if (_LastReadData == null)
             {
-                throw new Exception("Reentry");
+                throw new Exception("No data has been read");
             }
 
-            lock (_Chunks)
-            {
-                if (_Chunks.Count > 0)
-                {
-                    var retVal = _Chunks[0];
-                    Tracer?.Trace(false, retVal);
-                    _Chunks.RemoveAt(0);
-                    return retVal;
-                }
-            }
+            var retVal = _LastReadData.ToArray();
 
-            _IsReading = true;
-            _TaskCompletionSource = new TaskCompletionSource<byte[]>();
-            return await _TaskCompletionSource.Task;
+            _LastReadData = null;
+
+            return retVal;
         }
 
         public async Task WriteAsync(byte[] data)
@@ -227,7 +193,7 @@ namespace Hid.Net.UWP
                     Length = 0
                 };
 
-                var bytesTransferred = await _HidDevice.SendControlOutTransferAsync(setupPacket, buffer);
+                _LastReadData = await _HidDevice.SendControlInTransferAsync(setupPacket, buffer);
 
             }
             catch (ArgumentException ex)
