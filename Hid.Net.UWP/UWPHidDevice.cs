@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
@@ -153,8 +155,8 @@ namespace Hid.Net.UWP
             {
                 throw new Exception("No data has been read");
             }
-
-            var retVal = _LastReadData.ToArray();
+            var retVal = new byte[64];
+            _LastReadData.CopyTo(0, retVal, 0, 64);
 
             _LastReadData = null;
 
@@ -179,18 +181,15 @@ namespace Hid.Net.UWP
 
             try
             {
-                var setupPacket = new UsbSetupPacket
+
+                var setupPacket = new UsbSetupPacket()
                 {
-                    RequestType = new UsbControlRequestType
+                    RequestType = new UsbControlRequestType()
                     {
-                        Direction = UsbTransferDirection.Out,
-                        Recipient = UsbControlRecipient.Device,
+                        Recipient = UsbControlRecipient.DefaultInterface,
+
                         ControlTransferType = UsbControlTransferType.Vendor
-                    },
-                    //Whats this then?
-                    //Request = SuperMutt.VendorCommand.SetLedBlinkPattern,
-                    //Value = pattern,
-                    Length = 0
+                    }
                 };
 
                 _LastReadData = await _HidDevice.SendControlInTransferAsync(setupPacket, buffer);
