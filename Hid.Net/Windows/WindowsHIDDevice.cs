@@ -152,18 +152,9 @@ namespace Hid.Net
             _ReadSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
             _WriteSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
 
-            if (!APICalls.HidD_GetPreparsedData(_ReadSafeFileHandle, ref pointerToPreParsedData))
-            {
-                throw new Exception("Could not get pre parsed data");
-            }
-
-            var getCapsResult = APICalls.HidP_GetCaps(pointerToPreParsedData, ref _HidCollectionCapabilities);
-
             //TODO: Deal with issues here
 
             Marshal.FreeHGlobal(pointerToBuffer);
-
-            var preparsedDataResult = APICalls.HidD_FreePreparsedData(ref pointerToPreParsedData);
 
             //TODO: Deal with issues here
 
@@ -284,41 +275,7 @@ namespace Hid.Net
                 var manufacturer = string.Empty;
                 var pointerToBuffer = Marshal.AllocHGlobal(126);
 
-                var preparsedDataResult = APICalls.HidD_GetPreparsedData(safeFileHandle, ref pointerToPreParsedData);
-                if (!preparsedDataResult)
-                {
-                    return null;
-                }
-
-                //TODO: Deal with issues here
-
-                var getCapsResult = APICalls.HidP_GetCaps(pointerToPreParsedData, ref hidCollectionCapabilities);
-
-                //TODO: Deal with issues here
-
-                if (!APICalls.HidD_GetAttributes(safeFileHandle, ref hidAttributes))
-                {
-                    throw new Exception("Could not obtain attributes");
-                }
-
-                if (APICalls.HidD_GetManufacturerString(safeFileHandle, pointerToBuffer, 126))
-                {
-                    manufacturer = Marshal.PtrToStringUni(pointerToBuffer);
-                }
-
-                if (APICalls.HidD_GetSerialNumberString(safeFileHandle, pointerToBuffer, 126))
-                {
-                    serialNumber = Marshal.PtrToStringUni(pointerToBuffer);
-                }
-
-                if (APICalls.HidD_GetProductString(safeFileHandle, pointerToBuffer, 126))
-                {
-                    product = Marshal.PtrToStringUni(pointerToBuffer);
-                }
-
                 Marshal.FreeHGlobal(pointerToBuffer);
-
-                var getPreparsedDataResult = APICalls.HidD_FreePreparsedData(ref pointerToPreParsedData);
 
                 //TODO: Deal with issues here
 

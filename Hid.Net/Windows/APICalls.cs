@@ -23,31 +23,8 @@ namespace Hid.Net
         internal static extern SafeFileHandle CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, IntPtr hTemplateFile);
         #endregion
 
-        #region Hid
-        [DllImport("hid.dll", SetLastError = true)]
-        internal static extern bool HidD_FreePreparsedData(ref IntPtr pointerToPreparsedData);
-
-        [DllImport("hid.dll", SetLastError = true)]
-        internal static extern bool HidD_GetAttributes(SafeFileHandle hidDeviceObject, ref HidAttributes attributes);
-
         [DllImport("hid.dll", SetLastError = true)]
         internal static extern void HidD_GetHidGuid(ref Guid hidGuid);
-
-        [DllImport("hid.dll", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        internal static extern bool HidD_GetManufacturerString(SafeFileHandle hidDeviceObject, IntPtr pointerToBuffer, uint bufferLength);
-
-        [DllImport("hid.dll", SetLastError = true)]
-        internal static extern bool HidD_GetPreparsedData(SafeFileHandle hidDeviceObject, ref IntPtr pointerToPreparsedData);
-
-        [DllImport("hid.dll", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        internal static extern bool HidD_GetProductString(SafeFileHandle hidDeviceObject, IntPtr pointerToBuffer, uint bufferLength);
-
-        [DllImport("hid.dll", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
-        internal static extern bool HidD_GetSerialNumberString(SafeFileHandle hidDeviceObject, IntPtr pointerToBuffer, uint bufferLength);
-
-        [DllImport("hid.dll", SetLastError = true)]
-        internal static extern int HidP_GetCaps(IntPtr pointerToPreparsedData, ref HidCollectionCapabilities hidCollectionCapabilities);
-        #endregion
 
         #region SetupAPI
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
