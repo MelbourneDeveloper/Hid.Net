@@ -94,7 +94,7 @@ namespace Hid.Net
         #endregion
 
         #region Constructor
-        protected WindowsDeviceBase(string deviceId, ushort inputReportByteLength, ushort outputReportByteLength) 
+        protected WindowsDeviceBase(string deviceId, ushort inputReportByteLength, ushort outputReportByteLength)
         {
             DeviceId = deviceId;
             OutputReportByteLength = outputReportByteLength;
@@ -137,8 +137,6 @@ namespace Hid.Net
             {
                 throw new WindowsException($"{nameof(DeviceInformation)} must be specified before {nameof(Initialize)} can be called.");
             }
-
-            var pointerToPreParsedData = new IntPtr();
             var pointerToBuffer = Marshal.AllocHGlobal(126);
 
             _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
@@ -261,7 +259,6 @@ namespace Hid.Net
             {
                 var hidCollectionCapabilities = new HidCollectionCapabilities();
                 var hidAttributes = new HidAttributes();
-                var pointerToPreParsedData = new IntPtr();
                 var product = string.Empty;
                 var serialNumber = string.Empty;
                 var manufacturer = string.Empty;
