@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32.SafeHandles;
+﻿using Hid.Net.Windows;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -48,7 +49,7 @@ namespace Hid.Net
             spDeviceInterfaceData.CbSize = (uint)Marshal.SizeOf(spDeviceInterfaceData);
             spDeviceInfoData.CbSize = (uint)Marshal.SizeOf(spDeviceInfoData);
 
-            var hidGuid = new Guid("4d1e55b2-f16f-11cf-88cb-001111000030");
+            var hidGuid = WindowsDeviceConstants.GUID_DEVINTERFACE_HID;
 
             var i = APICalls.SetupDiGetClassDevs(ref hidGuid, IntPtr.Zero, IntPtr.Zero, APICalls.DigcfDeviceinterface | APICalls.DigcfPresent);
 
