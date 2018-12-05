@@ -23,13 +23,13 @@ namespace Hid.Net
         internal static extern SafeFileHandle CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, IntPtr hTemplateFile);
         #endregion
 
-        [DllImport("hid.dll", SetLastError = true)]
-        internal static extern void HidD_GetHidGuid(ref Guid hidGuid);
-
         #region SetupAPI
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern bool SetupDiDestroyDeviceInfoList(IntPtr deviceInfoSet);
 
+        /// <summary>
+        /// https://docs.microsoft.com/en-us/windows/desktop/api/setupapi/nf-setupapi-setupdienumdeviceinterfaces
+        /// </summary>
         [DllImport(@"setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern bool SetupDiEnumDeviceInterfaces(IntPtr hDevInfo, IntPtr devInfo, ref Guid interfaceClassGuid, uint memberIndex, ref SpDeviceInterfaceData deviceInterfaceData);
 
