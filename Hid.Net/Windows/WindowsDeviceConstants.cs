@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hid.Net.Windows
+namespace Hid.Net
 {
     public class WindowsDeviceConstants
     {

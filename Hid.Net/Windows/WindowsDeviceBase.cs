@@ -1,5 +1,4 @@
-﻿using Hid.Net.Windows;
-using Microsoft.Win32.SafeHandles;
+﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -36,7 +35,7 @@ namespace Hid.Net
         #endregion
 
         #region Public Static Methods
-        public static Collection<DeviceInformation> GetConnectedDeviceInformations()
+        public static Collection<DeviceInformation> GetConnectedDeviceInformations(Guid classGuid)
         {
             var deviceInformations = new Collection<DeviceInformation>();
             var spDeviceInterfaceData = new SpDeviceInterfaceData();
@@ -45,9 +44,7 @@ namespace Hid.Net
             spDeviceInterfaceData.CbSize = (uint)Marshal.SizeOf(spDeviceInterfaceData);
             spDeviceInfoData.CbSize = (uint)Marshal.SizeOf(spDeviceInfoData);
 
-            var hidGuid = WindowsDeviceConstants.GUID_DEVINTERFACE_USB_DEVICE;
-
-            var i = APICalls.SetupDiGetClassDevs(ref hidGuid, IntPtr.Zero, IntPtr.Zero, APICalls.DigcfDeviceinterface | APICalls.DigcfPresent);
+            var i = APICalls.SetupDiGetClassDevs(ref classGuid, IntPtr.Zero, IntPtr.Zero, APICalls.DigcfDeviceinterface | APICalls.DigcfPresent);
 
             if (IntPtr.Size == 8)
             {
@@ -64,7 +61,7 @@ namespace Hid.Net
             {
                 x++;
 
-                var setupDiEnumDeviceInterfacesResult = APICalls.SetupDiEnumDeviceInterfaces(i, IntPtr.Zero, ref hidGuid, (uint)x, ref spDeviceInterfaceData);
+                var setupDiEnumDeviceInterfacesResult = APICalls.SetupDiEnumDeviceInterfaces(i, IntPtr.Zero, ref classGuid, (uint)x, ref spDeviceInterfaceData);
                 var errorNumber = Marshal.GetLastWin32Error();
 
                 //TODO: deal with error numbers. Give a meaningful error message
