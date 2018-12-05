@@ -30,12 +30,8 @@ namespace Hid.Net
 
         #region Public Properties
         public bool DataHasExtraByte { get; set; } = true;
-        //public DeviceInformation DeviceInformation { get; set; }
         public string DeviceId { get; }
-        //public string DevicePath => DeviceInformation.DevicePath;
         public bool IsInitialized { get; private set; }
-        //public int ProductId => DeviceInformation.ProductId;
-        //public int VendorId => DeviceInformation.VendorId;
         public ushort InputReportByteLength { get; set; }
         public ushort OutputReportByteLength { get; set; }
         #endregion
