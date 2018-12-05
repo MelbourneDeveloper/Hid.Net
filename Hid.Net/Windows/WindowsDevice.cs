@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hid.Net
 {
-    public class WindowsHidDevice : DeviceBase, IDevice
+    public class WindowsDevice : DeviceBase, IDevice
     {
         //TODO: Implement
         #region Events
@@ -25,7 +25,7 @@ namespace Hid.Net
         #endregion
 
         #region Private Properties
-        private string LogSection => nameof(WindowsHidDevice);
+        private string LogSection => nameof(WindowsDevice);
         #endregion
 
         #region Public Properties
@@ -97,11 +97,11 @@ namespace Hid.Net
         #endregion
 
         #region Constructor
-        public WindowsHidDevice()
+        public WindowsDevice()
         {
         }
 
-        public WindowsHidDevice(DeviceInformation deviceInformation, ushort inputReportByteLength, ushort outputReportByteLength) : this()
+        public WindowsDevice(DeviceInformation deviceInformation, ushort inputReportByteLength, ushort outputReportByteLength) : this()
         {
             DeviceInformation = deviceInformation;
             OutputReportByteLength = outputReportByteLength;
@@ -142,7 +142,7 @@ namespace Hid.Net
 
             if (DeviceInformation == null)
             {
-                throw new WindowsHidException($"{nameof(DeviceInformation)} must be specified before {nameof(Initialize)} can be called.");
+                throw new WindowsException($"{nameof(DeviceInformation)} must be specified before {nameof(Initialize)} can be called.");
             }
 
             var pointerToPreParsedData = new IntPtr();
