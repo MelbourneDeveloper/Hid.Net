@@ -45,7 +45,7 @@ namespace Hid.Net
             spDeviceInterfaceData.CbSize = (uint)Marshal.SizeOf(spDeviceInterfaceData);
             spDeviceInfoData.CbSize = (uint)Marshal.SizeOf(spDeviceInfoData);
 
-            var hidGuid = WindowsDeviceConstants.GUID_DEVINTERFACE_HID;
+            var hidGuid = WindowsDeviceConstants.GUID_DEVINTERFACE_USB_DEVICE;
 
             var i = APICalls.SetupDiGetClassDevs(ref hidGuid, IntPtr.Zero, IntPtr.Zero, APICalls.DigcfDeviceinterface | APICalls.DigcfPresent);
 
