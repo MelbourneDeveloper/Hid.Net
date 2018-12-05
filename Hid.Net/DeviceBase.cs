@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hid.Net
 {
-    public class HidDeviceBase
+    public class DeviceBase
     {
         public ITracer Tracer { get; set; }
     }

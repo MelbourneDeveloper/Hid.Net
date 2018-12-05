@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hid.Net.Android
 {
-    public class AndroidHidDevice : HidDeviceBase, IDevice
+    public class AndroidHidDevice : DeviceBase, IDevice
     {
         #region Fields
         private UsbDeviceConnection _UsbDeviceConnection;

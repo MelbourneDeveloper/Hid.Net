@@ -9,7 +9,7 @@ using Windows.Storage;
 
 namespace Hid.Net.UWP
 {
-    public class UWPHidDevice : HidDeviceBase, IDevice
+    public class UWPHidDevice : DeviceBase, IDevice
     {
         #region Events
         public event EventHandler Connected;

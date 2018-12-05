@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hid.Net
 {
-    public class WindowsHidDevice : HidDeviceBase, IDevice
+    public class WindowsHidDevice : DeviceBase, IDevice
     {
         //TODO: Implement
         #region Events
@@ -228,7 +228,7 @@ namespace Hid.Net
             {
                 if (OutputReportByteLength == data.Length)
                 {
-                    throw new HidException($"The data sent to the device was a the same length as the HidCollectionCapabilities.OutputReportByteLength. This probably indicates that DataHasExtraByte should be set to false.");
+                    throw new DeviceException($"The data sent to the device was a the same length as the HidCollectionCapabilities.OutputReportByteLength. This probably indicates that DataHasExtraByte should be set to false.");
                 }
 
                 bytes = new byte[OutputReportByteLength];
