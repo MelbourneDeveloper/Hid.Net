@@ -31,8 +31,8 @@ namespace Hid.Net
         public bool DataHasExtraByte { get; set; } = true;
         public string DeviceId { get; }
         public bool IsInitialized { get; private set; }
-        public ushort InputReportByteLength { get; set; }
-        public ushort OutputReportByteLength { get; set; }
+        public abstract ushort InputReportByteLength { get;  }
+        public abstract ushort OutputReportByteLength { get;  }
         #endregion
 
         #region Public Static Methods
@@ -93,11 +93,9 @@ namespace Hid.Net
         #endregion
 
         #region Constructor
-        protected WindowsDeviceBase(string deviceId, ushort inputReportByteLength, ushort outputReportByteLength)
+        protected WindowsDeviceBase(string deviceId)
         {
             DeviceId = deviceId;
-            OutputReportByteLength = outputReportByteLength;
-            InputReportByteLength = inputReportByteLength;
         }
         #endregion
 
