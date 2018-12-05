@@ -16,7 +16,7 @@ namespace Hid.Net
         #endregion
 
         #region Fields
-        private HidCollectionCapabilities _HidCollectionCapabilities;
+        //private HidCollectionCapabilities _HidCollectionCapabilities;
         private FileStream _ReadFileStream;
         private SafeFileHandle _ReadSafeFileHandle;
         private FileStream _WriteFileStream;
@@ -24,7 +24,6 @@ namespace Hid.Net
         #endregion
 
         #region Private Properties
-        private ushort OutputReportByteLength => _HidCollectionCapabilities.OutputReportByteLength > 0 ? _HidCollectionCapabilities.OutputReportByteLength : (ushort)DeviceInformation.OutputReportByteLength;
         private string LogSection => nameof(WindowsHidDevice);
         #endregion
 
@@ -34,9 +33,9 @@ namespace Hid.Net
         public string DevicePath => DeviceInformation.DevicePath;
         public bool IsInitialized { get; private set; }
         public int ProductId => DeviceInformation.ProductId;
-        public ushort Usage => _HidCollectionCapabilities.Usage;
-        public ushort UsagePage => _HidCollectionCapabilities.UsagePage;
         public int VendorId => DeviceInformation.VendorId;
+        public ushort InputReportByteLength { get; set; }
+        public ushort OutputReportByteLength { get; set; }
         #endregion
 
         #region Public Static Methods
@@ -103,9 +102,11 @@ namespace Hid.Net
         {
         }
 
-        public WindowsHidDevice(DeviceInformation deviceInformation) : this()
+        public WindowsHidDevice(DeviceInformation deviceInformation, ushort inputReportByteLength, ushort outputReportByteLength) : this()
         {
             DeviceInformation = deviceInformation;
+            OutputReportByteLength = outputReportByteLength;
+            InputReportByteLength = inputReportByteLength;
         }
         #endregion
 
@@ -146,7 +147,6 @@ namespace Hid.Net
             }
 
             var pointerToPreParsedData = new IntPtr();
-            _HidCollectionCapabilities = new HidCollectionCapabilities();
             var pointerToBuffer = Marshal.AllocHGlobal(126);
 
             _ReadSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
@@ -163,8 +163,8 @@ namespace Hid.Net
                 return false;
             }
 
-            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.ReadWrite, _HidCollectionCapabilities.OutputReportByteLength, false);
-            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.ReadWrite, _HidCollectionCapabilities.InputReportByteLength, false);
+            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.ReadWrite, OutputReportByteLength, false);
+            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.ReadWrite, InputReportByteLength, false);
 
             IsInitialized = true;
 
@@ -185,7 +185,7 @@ namespace Hid.Net
                 throw new Exception("The device has not been initialized");
             }
 
-            var bytes = new byte[_HidCollectionCapabilities.InputReportByteLength];
+            var bytes = new byte[InputReportByteLength];
 
             try
             {
@@ -221,7 +221,7 @@ namespace Hid.Net
 
             if (data.Length > OutputReportByteLength)
             {
-                throw new Exception($"Data is longer than {_HidCollectionCapabilities.OutputReportByteLength - 1} bytes which is the device's OutputReportByteLength.");
+                throw new Exception($"Data is longer than {OutputReportByteLength - 1} bytes which is the device's OutputReportByteLength.");
             }
 
             byte[] bytes;
