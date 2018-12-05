@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Hid.Net
 {
-    public interface IHidDevice : IDisposable
+    public interface IDevice : IDisposable
     {
         /// <summary>
         /// Occurs after the device has successfully connected. Note: this can be called multiple times and will occurr every time  InitializeAsync is called successfull. 
@@ -29,16 +29,6 @@ namespace Hid.Net
         /// Write a page of data
         /// </summary>
         Task WriteAsync(byte[] data);
-
-        /// <summary>
-        /// The device's Vendor Id
-        /// </summary>
-        int VendorId { get; }
-
-        /// <summary>
-        /// The device's Product Id
-        /// </summary>
-        int ProductId { get; }
 
         /// <summary>
         /// Dispose of any existing connections and reinitialize the device

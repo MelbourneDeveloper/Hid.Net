@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hid.Net
 {
-    public class WindowsHidDevice : HidDeviceBase, IHidDevice
+    public class WindowsHidDevice : HidDeviceBase, IDevice
     {
         //TODO: Implement
         #region Events
