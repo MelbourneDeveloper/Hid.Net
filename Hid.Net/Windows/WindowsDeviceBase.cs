@@ -17,7 +17,6 @@ namespace Hid.Net
         #endregion
 
         #region Fields
-        //private HidCollectionCapabilities _HidCollectionCapabilities;
         private FileStream _ReadFileStream;
         private SafeFileHandle _ReadSafeFileHandle;
         private FileStream _WriteFileStream;
