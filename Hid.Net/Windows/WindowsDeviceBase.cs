@@ -30,8 +30,8 @@ namespace Hid.Net
         public bool DataHasExtraByte { get; set; } = true;
         public string DeviceId { get; }
         public bool IsInitialized { get; private set; }
-        public abstract ushort WriteBufferSize { get;  }
-        public abstract ushort ReadBufferSize { get;  }
+        public abstract ushort WriteBufferSize { get; }
+        public abstract ushort ReadBufferSize { get; }
         #endregion
 
         #region Public Static Methods
@@ -133,8 +133,8 @@ namespace Hid.Net
             }
             var pointerToBuffer = Marshal.AllocHGlobal(126);
 
-            _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
-            _WriteSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
+            _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead, APICalls.FileShareRead , IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
+            _WriteSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericWrite,  APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
 
             //TODO: Deal with issues here
 
@@ -147,8 +147,8 @@ namespace Hid.Net
                 return false;
             }
 
-            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.ReadWrite, ReadBufferSize, false);
-            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.ReadWrite, WriteBufferSize, false);
+            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.Read, ReadBufferSize, false);
+            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.Write, WriteBufferSize, false);
 
             IsInitialized = true;
 
@@ -173,7 +173,7 @@ namespace Hid.Net
 
             try
             {
-                 _ReadFileStream.Read(bytes, 0, bytes.Length);
+                _ReadFileStream.Read(bytes, 0, bytes.Length);
             }
             catch (Exception ex)
             {
@@ -205,7 +205,7 @@ namespace Hid.Net
 
             if (data.Length > WriteBufferSize)
             {
-                throw new Exception($"Data is longer than {WriteBufferSize - 1} bytes which is the device's OutputReportByteLength.");
+                throw new Exception($"Data is longer than {WriteBufferSize} bytes which is the device's OutputReportByteLength.");
             }
 
             byte[] bytes;
