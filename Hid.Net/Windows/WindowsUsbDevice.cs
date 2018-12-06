@@ -5,15 +5,15 @@ namespace Hid.Net
     public class WindowsUsbDevice : WindowsDeviceBase
     {
         #region Public Methods
-        public override ushort InputReportByteLength { get; }
-        public override ushort OutputReportByteLength { get; }   
+        public override ushort WriteBufferSize { get; }
+        public override ushort ReadBufferSize { get; }   
         #endregion
 
         #region Constructor
-        public WindowsUsbDevice(string deviceId, ushort inputReportByteLength, ushort outputReportByteLength) : base(deviceId)
+        public WindowsUsbDevice(string deviceId, ushort writeBufferSzie, ushort readBufferSize) : base(deviceId)
         {
-            InputReportByteLength = inputReportByteLength;
-            OutputReportByteLength = outputReportByteLength;
+            WriteBufferSize = writeBufferSzie;
+            ReadBufferSize = readBufferSize;
         }
         #endregion
     }

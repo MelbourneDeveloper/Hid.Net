@@ -30,8 +30,8 @@ namespace Hid.Net
         public bool DataHasExtraByte { get; set; } = true;
         public string DeviceId { get; }
         public bool IsInitialized { get; private set; }
-        public abstract ushort InputReportByteLength { get;  }
-        public abstract ushort OutputReportByteLength { get;  }
+        public abstract ushort WriteBufferSize { get;  }
+        public abstract ushort ReadBufferSize { get;  }
         #endregion
 
         #region Public Static Methods
@@ -147,8 +147,8 @@ namespace Hid.Net
                 return false;
             }
 
-            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.ReadWrite, OutputReportByteLength, false);
-            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.ReadWrite, InputReportByteLength, false);
+            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.ReadWrite, ReadBufferSize, false);
+            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.ReadWrite, WriteBufferSize, false);
 
             IsInitialized = true;
 
@@ -169,11 +169,11 @@ namespace Hid.Net
                 throw new Exception("The device has not been initialized");
             }
 
-            var bytes = new byte[InputReportByteLength];
+            var bytes = new byte[ReadBufferSize];
 
             try
             {
-                await _ReadFileStream.ReadAsync(bytes, 0, bytes.Length);
+                 _ReadFileStream.Read(bytes, 0, bytes.Length);
             }
             catch (Exception ex)
             {
@@ -203,20 +203,20 @@ namespace Hid.Net
                 throw new Exception("The device has not been initialized");
             }
 
-            if (data.Length > OutputReportByteLength)
+            if (data.Length > WriteBufferSize)
             {
-                throw new Exception($"Data is longer than {OutputReportByteLength - 1} bytes which is the device's OutputReportByteLength.");
+                throw new Exception($"Data is longer than {WriteBufferSize - 1} bytes which is the device's OutputReportByteLength.");
             }
 
             byte[] bytes;
             if (DataHasExtraByte)
             {
-                if (OutputReportByteLength == data.Length)
+                if (WriteBufferSize == data.Length)
                 {
                     throw new DeviceException($"The data sent to the device was a the same length as the HidCollectionCapabilities.OutputReportByteLength. This probably indicates that DataHasExtraByte should be set to false.");
                 }
 
-                bytes = new byte[OutputReportByteLength];
+                bytes = new byte[WriteBufferSize];
                 Array.Copy(data, 0, bytes, 1, data.Length);
                 bytes[0] = 0;
             }
@@ -229,7 +229,7 @@ namespace Hid.Net
             {
                 try
                 {
-                    await _WriteFileStream.WriteAsync(bytes, 0, bytes.Length);
+                    _WriteFileStream.Write(bytes, 0, bytes.Length);
                 }
                 catch (Exception ex)
                 {
