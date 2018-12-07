@@ -73,11 +73,7 @@ namespace Hid.Net
 
                 APICalls.SetupDiGetDeviceInterfaceDetail(i, ref spDeviceInterfaceData, ref spDeviceInterfaceDetailData, 256, out _, ref spDeviceInfoData);
 
-                var deviceInformation = GetDeviceInformation(spDeviceInterfaceDetailData.DevicePath);
-                if (deviceInformation == null)
-                {
-                    continue;
-                }
+                var deviceInformation = new DeviceInformation { DevicePath = spDeviceInterfaceDetailData.DevicePath };
 
                 deviceInformations.Add(deviceInformation);
             }
@@ -133,8 +129,8 @@ namespace Hid.Net
             }
             var pointerToBuffer = Marshal.AllocHGlobal(126);
 
-            _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
-            _WriteSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
+            _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
+            _WriteSafeFileHandle = APICalls.CreateFile(DeviceId, FileAccess.Write, FileShare.Write, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
 
             //TODO: Deal with issues here
 
@@ -242,42 +238,6 @@ namespace Hid.Net
             else
             {
                 throw new IOException("The file stream cannot be written to");
-            }
-        }
-        #endregion
-
-        #region Private Static Methods
-        private static DeviceInformation GetDeviceInformation(string devicePath)
-        {
-            using (var safeFileHandle = APICalls.CreateFile(devicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero))
-            {
-                var hidCollectionCapabilities = new HidCollectionCapabilities();
-                var hidAttributes = new HidAttributes();
-                var product = string.Empty;
-                var serialNumber = string.Empty;
-                var manufacturer = string.Empty;
-                var pointerToBuffer = Marshal.AllocHGlobal(126);
-
-                Marshal.FreeHGlobal(pointerToBuffer);
-
-                //TODO: Deal with issues here
-
-                var deviceInformation = new DeviceInformation
-                {
-                    DevicePath = devicePath,
-                    InputReportByteLength = hidCollectionCapabilities.InputReportByteLength,
-                    Manufacturer = manufacturer,
-                    OutputReportByteLength = hidCollectionCapabilities.OutputReportByteLength,
-                    Product = product,
-                    ProductId = (ushort)hidAttributes.ProductId,
-                    SerialNumber = serialNumber,
-                    Usage = hidCollectionCapabilities.Usage,
-                    UsagePage = hidCollectionCapabilities.UsagePage,
-                    VendorId = (ushort)hidAttributes.VendorId,
-                    VersionNumber = (ushort)hidAttributes.VersionNumber
-                };
-
-                return deviceInformation;
             }
         }
         #endregion
