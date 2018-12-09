@@ -27,7 +27,6 @@ namespace Hid.Net
         #endregion
 
         #region Public Properties
-        public bool DataHasExtraByte { get; set; } = true;
         public string DeviceId { get; }
         public bool IsInitialized { get; private set; }
         public abstract ushort WriteBufferSize { get; }
@@ -177,19 +176,9 @@ namespace Hid.Net
                 throw new IOException(Helpers.ReadErrorMessage, ex);
             }
 
-            byte[] retVal;
-            if (DataHasExtraByte)
-            {
-                retVal = Helpers.RemoveFirstByte(bytes);
-            }
-            else
-            {
-                retVal = bytes;
-            }
+            Tracer?.Trace(false, bytes);
 
-            Tracer?.Trace(false, retVal);
-
-            return retVal;
+            return bytes;
         }
 
         public async Task WriteAsync(byte[] data)
@@ -203,29 +192,12 @@ namespace Hid.Net
             {
                 throw new Exception($"Data is longer than {WriteBufferSize} bytes which is the device's OutputReportByteLength.");
             }
-
-            byte[] bytes;
-            if (DataHasExtraByte)
-            {
-                if (WriteBufferSize == data.Length)
-                {
-                    throw new DeviceException($"The data sent to the device was a the same length as the HidCollectionCapabilities.OutputReportByteLength. This probably indicates that DataHasExtraByte should be set to false.");
-                }
-
-                bytes = new byte[WriteBufferSize];
-                Array.Copy(data, 0, bytes, 1, data.Length);
-                bytes[0] = 0;
-            }
-            else
-            {
-                bytes = data;
-            }
-
+      
             if (_WriteFileStream.CanWrite)
             {
                 try
                 {
-                    _WriteFileStream.Write(bytes, 0, bytes.Length);
+                    _WriteFileStream.Write(data, 0, data.Length);
                 }
                 catch (Exception ex)
                 {
@@ -233,7 +205,7 @@ namespace Hid.Net
                     throw new IOException(Helpers.WriteErrorMessage, ex);
                 }
 
-                Tracer?.Trace(true, bytes);
+                Tracer?.Trace(true, data);
             }
             else
             {
