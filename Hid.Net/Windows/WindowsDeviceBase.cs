@@ -128,8 +128,8 @@ namespace Hid.Net
             }
             var pointerToBuffer = Marshal.AllocHGlobal(126);
 
-            _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, FileAccess.Read, FileShare.Read, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
-            _WriteSafeFileHandle = APICalls.CreateFile(DeviceId, FileAccess.Write, FileShare.Write, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
+            _ReadSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
+            _WriteSafeFileHandle = APICalls.CreateFile(DeviceId, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
 
             //TODO: Deal with issues here
 
@@ -139,11 +139,16 @@ namespace Hid.Net
 
             if (_ReadSafeFileHandle.IsInvalid)
             {
-                return false;
+                throw new Exception("Read handle no good");
             }
 
-            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.Read, ReadBufferSize, false);
-            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.Write, WriteBufferSize, false);
+            if (_WriteSafeFileHandle.IsInvalid)
+            {
+                throw new Exception("Write handle no good");
+            }
+
+            _ReadFileStream = new FileStream(_ReadSafeFileHandle, FileAccess.ReadWrite, ReadBufferSize, false);
+            _WriteFileStream = new FileStream(_WriteSafeFileHandle, FileAccess.ReadWrite, WriteBufferSize, false);
 
             IsInitialized = true;
 
@@ -197,7 +202,7 @@ namespace Hid.Net
             {
                 try
                 {
-                    _WriteFileStream.Write(data, 0, data.Length);
+                    await _WriteFileStream.WriteAsync(data, 0, data.Length);
                 }
                 catch (Exception ex)
                 {
