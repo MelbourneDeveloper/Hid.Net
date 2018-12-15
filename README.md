@@ -15,8 +15,11 @@ Currently supports:
 * .NET Core
 * Android
 * UWP 
+* Linux* (With LibUsbDotNet Provider)
 
 **Would love to hear from you if you'd like to add Linux or MacOS support!**
+
+Here is an example of use with LibUsbDotNet: https://github.com/MelbourneDeveloper/Trezor.Net/blob/master/src/Trezor.Net.UnitTest/LibUsbDevice.cs . This can be used for Linux support, but as yet, no project has used this. Please contact me through the issues section if you have any trouble making this work on Linux.
 
 ## Samples & Unit Tests
 
