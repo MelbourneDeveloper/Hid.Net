@@ -37,7 +37,7 @@ Supports .NET, Android, and UWP out of the box. Other platforms can be added</De
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Device.Net" Version="1.1.0" />
+    <PackageReference Include="Device.Net" Version="1.2.0" />
   </ItemGroup>
 
 </Project>

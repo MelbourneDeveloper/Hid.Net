@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Hardware.Usb;
+using Device.Net;
 using System;
 
 namespace Hid.Net.Android
