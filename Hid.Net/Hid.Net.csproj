@@ -36,4 +36,8 @@ Supports .NET, Android, and UWP out of the box. Other platforms can be added</De
     <OutputPath>C:\GitRepos\hid.net\NuGet\</OutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Device.Net" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>
