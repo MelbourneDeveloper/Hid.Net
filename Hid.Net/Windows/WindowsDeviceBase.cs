@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32.SafeHandles;
+﻿using Device.Net;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;

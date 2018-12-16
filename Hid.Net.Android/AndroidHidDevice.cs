@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Hardware.Usb;
+using Device.Net;
 using Java.Nio;
 using System;
 using System.IO;
