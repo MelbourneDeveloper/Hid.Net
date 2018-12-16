@@ -6,7 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace Hid.Net
+namespace Hid.Net.Windows
 {
     public class WindowsHidDevice : DeviceBase, IDevice
     {
@@ -31,7 +31,7 @@ namespace Hid.Net
 
         #region Public Properties
         public bool DataHasExtraByte { get; set; } = true;
-        public DeviceInformation DeviceInformation { get; set; }
+        public WindowsHidDeviceInformation DeviceInformation { get; set; }
         public string DevicePath => DeviceInformation.DevicePath;
         public bool IsInitialized { get; private set; }
         public int ProductId => DeviceInformation.ProductId;
@@ -104,7 +104,7 @@ namespace Hid.Net
         {
         }
 
-        public WindowsHidDevice(DeviceInformation deviceInformation) : this()
+        public WindowsHidDevice(WindowsHidDeviceInformation deviceInformation) : this()
         {
             DeviceInformation = deviceInformation;
         }
@@ -323,7 +323,7 @@ namespace Hid.Net
 
                 //TODO: Deal with issues here
 
-                var deviceInformation = new DeviceInformation
+                var deviceInformation = new WindowsHidDeviceInformation
                 {
                     DevicePath = devicePath,
                     InputReportByteLength = hidCollectionCapabilities.InputReportByteLength,

@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Hid.Net
+namespace Hid.Net.Windows
 {
     public static class HidAPICalls 
     {
