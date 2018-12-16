@@ -41,9 +41,9 @@ namespace Hid.Net.Windows
         #endregion
 
         #region Public Static Methods
-        public static Collection<DeviceInformation> GetConnectedDeviceInformations()
+        public static Collection<WindowsHidDeviceInformation> GetConnectedDeviceInformations()
         {
-            var deviceInformations = new Collection<DeviceInformation>();
+            var deviceInformations = new Collection<WindowsHidDeviceInformation>();
             var spDeviceInterfaceData = new SpDeviceInterfaceData();
             var spDeviceInfoData = new SpDeviceInfoData();
             var spDeviceInterfaceDetailData = new SpDeviceInterfaceDetailData();
@@ -273,7 +273,7 @@ namespace Hid.Net.Windows
         #endregion
 
         #region Private Static Methods
-        private static DeviceInformation GetDeviceInformation(string devicePath)
+        private static WindowsHidDeviceInformation GetDeviceInformation(string devicePath)
         {
             using (var safeFileHandle = APICalls.CreateFile(devicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero))
             {
