@@ -1,26 +1,26 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "c2595960e355b23b444afcac6f477fc2daae9a99"
+    "signature": "31d505322ce4395a944d0f4cf998a6cbc04ef33d"
   },
   "compilationOptions": {},
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "Hid.Net.Windows/1.5.0": {
+      "Hid.Net.Windows/2.0.0": {
         "dependencies": {
-          "Device.Net": "1.5.0",
+          "Device.Net": "2.0.0",
           "NETStandard.Library": "2.0.3"
         },
         "runtime": {
           "Hid.Net.Windows.dll": {}
         }
       },
-      "Device.Net/1.5.0": {
+      "Device.Net/2.0.0": {
         "runtime": {
           "lib/netstandard2.0/Device.Net.dll": {
-            "assemblyVersion": "1.5.0.0",
-            "fileVersion": "1.5.0.0"
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
           }
         }
       },
@@ -33,17 +33,17 @@
     }
   },
   "libraries": {
-    "Hid.Net.Windows/1.5.0": {
+    "Hid.Net.Windows/2.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Device.Net/1.5.0": {
+    "Device.Net/2.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-MaShYgZxA1kIR2lhSjubfrGp6qzo1WQlyIk5NndzvW8mBuwor3LftorKrNPBCka+iHSQjzyD7Bs6t4XyH+rfGQ==",
-      "path": "device.net/1.5.0",
-      "hashPath": "device.net.1.5.0.nupkg.sha512"
+      "sha512": "sha512-qt4ZRcOXO46p7JsQvX2RBPvAsQOl2OzIrKQhEQeAv68Bu6JachoQ48dd9pwK9uFqp4LeX285M8Dmntnm84EFPw==",
+      "path": "device.net/2.0.0",
+      "hashPath": "device.net.2.0.0.nupkg.sha512"
     },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "type": "package",
