@@ -60,6 +60,10 @@ Ethereum: 0x7ba0ea9975ac0efb5319886a287dcf5eecd3038e
 
 Litecoin: MVAbLaNPq7meGXvZMU4TwypUsDEuU6stpY
 
+## [Device.Net](https://github.com/MelbourneDeveloper/Device.Net)
+
+Base library for talking to different kinds of connected devices (Usb, Hid, etc) through dependency injection.
+
 ## Useful Resources
 
 UWP Permissions (they are a real pain)
