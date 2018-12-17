@@ -13,7 +13,7 @@ https://christianfindlay.wordpress.com
 Currently supports:
 * .NET Framework
 * .NET Core
-* Android
+* Android - [Usb.Net](https://github.com/MelbourneDeveloper/Usb.Net 
 * UWP 
 * Linux* (With LibUsbDotNet Provider)
 
