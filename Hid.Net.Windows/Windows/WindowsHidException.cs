@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Hid.Net
+namespace Hid.Net.Windows
 {
     public class WindowsHidException : Exception
     {

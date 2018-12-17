@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Hid.Net
+namespace Hid.Net.Windows
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct HidCollectionCapabilities

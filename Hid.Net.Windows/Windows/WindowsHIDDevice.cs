@@ -1,13 +1,14 @@
-﻿using Microsoft.Win32.SafeHandles;
+﻿using Device.Net;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace Hid.Net
+namespace Hid.Net.Windows
 {
-    public class WindowsHidDevice : HidDeviceBase, IHidDevice
+    public class WindowsHidDevice : DeviceBase, IDevice
     {
         //TODO: Implement
         #region Events
@@ -30,7 +31,7 @@ namespace Hid.Net
 
         #region Public Properties
         public bool DataHasExtraByte { get; set; } = true;
-        public DeviceInformation DeviceInformation { get; set; }
+        public WindowsHidDeviceInformation DeviceInformation { get; set; }
         public string DevicePath => DeviceInformation.DevicePath;
         public bool IsInitialized { get; private set; }
         public int ProductId => DeviceInformation.ProductId;
@@ -40,9 +41,9 @@ namespace Hid.Net
         #endregion
 
         #region Public Static Methods
-        public static Collection<DeviceInformation> GetConnectedDeviceInformations()
+        public static Collection<WindowsHidDeviceInformation> GetConnectedDeviceInformations()
         {
-            var deviceInformations = new Collection<DeviceInformation>();
+            var deviceInformations = new Collection<WindowsHidDeviceInformation>();
             var spDeviceInterfaceData = new SpDeviceInterfaceData();
             var spDeviceInfoData = new SpDeviceInfoData();
             var spDeviceInterfaceDetailData = new SpDeviceInterfaceDetailData();
@@ -51,7 +52,7 @@ namespace Hid.Net
 
             var hidGuid = new Guid();
 
-            APICalls.HidD_GetHidGuid(ref hidGuid);
+            HidAPICalls.HidD_GetHidGuid(ref hidGuid);
 
             var i = APICalls.SetupDiGetClassDevs(ref hidGuid, IntPtr.Zero, IntPtr.Zero, APICalls.DigcfDeviceinterface | APICalls.DigcfPresent);
 
@@ -103,7 +104,7 @@ namespace Hid.Net
         {
         }
 
-        public WindowsHidDevice(DeviceInformation deviceInformation) : this()
+        public WindowsHidDevice(WindowsHidDeviceInformation deviceInformation) : this()
         {
             DeviceInformation = deviceInformation;
         }
@@ -152,18 +153,18 @@ namespace Hid.Net
             _ReadSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
             _WriteSafeFileHandle = APICalls.CreateFile(DeviceInformation.DevicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero);
 
-            if (!APICalls.HidD_GetPreparsedData(_ReadSafeFileHandle, ref pointerToPreParsedData))
+            if (!HidAPICalls.HidD_GetPreparsedData(_ReadSafeFileHandle, ref pointerToPreParsedData))
             {
                 throw new Exception("Could not get pre parsed data");
             }
 
-            var getCapsResult = APICalls.HidP_GetCaps(pointerToPreParsedData, ref _HidCollectionCapabilities);
+            var getCapsResult = HidAPICalls.HidP_GetCaps(pointerToPreParsedData, ref _HidCollectionCapabilities);
 
             //TODO: Deal with issues here
 
             Marshal.FreeHGlobal(pointerToBuffer);
 
-            var preparsedDataResult = APICalls.HidD_FreePreparsedData(ref pointerToPreParsedData);
+            var preparsedDataResult = HidAPICalls.HidD_FreePreparsedData(ref pointerToPreParsedData);
 
             //TODO: Deal with issues here
 
@@ -238,7 +239,7 @@ namespace Hid.Net
             {
                 if (OutputReportByteLength == data.Length)
                 {
-                    throw new HidException($"The data sent to the device was a the same length as the HidCollectionCapabilities.OutputReportByteLength. This probably indicates that DataHasExtraByte should be set to false.");
+                    throw new DeviceException($"The data sent to the device was a the same length as the HidCollectionCapabilities.OutputReportByteLength. This probably indicates that DataHasExtraByte should be set to false.");
                 }
 
                 bytes = new byte[OutputReportByteLength];
@@ -272,7 +273,7 @@ namespace Hid.Net
         #endregion
 
         #region Private Static Methods
-        private static DeviceInformation GetDeviceInformation(string devicePath)
+        private static WindowsHidDeviceInformation GetDeviceInformation(string devicePath)
         {
             using (var safeFileHandle = APICalls.CreateFile(devicePath, APICalls.GenericRead | APICalls.GenericWrite, APICalls.FileShareRead | APICalls.FileShareWrite, IntPtr.Zero, APICalls.OpenExisting, 0, IntPtr.Zero))
             {
@@ -284,7 +285,7 @@ namespace Hid.Net
                 var manufacturer = string.Empty;
                 var pointerToBuffer = Marshal.AllocHGlobal(126);
 
-                var preparsedDataResult = APICalls.HidD_GetPreparsedData(safeFileHandle, ref pointerToPreParsedData);
+                var preparsedDataResult = HidAPICalls.HidD_GetPreparsedData(safeFileHandle, ref pointerToPreParsedData);
                 if (!preparsedDataResult)
                 {
                     return null;
@@ -292,37 +293,37 @@ namespace Hid.Net
 
                 //TODO: Deal with issues here
 
-                var getCapsResult = APICalls.HidP_GetCaps(pointerToPreParsedData, ref hidCollectionCapabilities);
+                var getCapsResult = HidAPICalls.HidP_GetCaps(pointerToPreParsedData, ref hidCollectionCapabilities);
 
                 //TODO: Deal with issues here
 
-                if (!APICalls.HidD_GetAttributes(safeFileHandle, ref hidAttributes))
+                if (!HidAPICalls.HidD_GetAttributes(safeFileHandle, ref hidAttributes))
                 {
                     throw new Exception("Could not obtain attributes");
                 }
 
-                if (APICalls.HidD_GetManufacturerString(safeFileHandle, pointerToBuffer, 126))
+                if (HidAPICalls.HidD_GetManufacturerString(safeFileHandle, pointerToBuffer, 126))
                 {
                     manufacturer = Marshal.PtrToStringUni(pointerToBuffer);
                 }
 
-                if (APICalls.HidD_GetSerialNumberString(safeFileHandle, pointerToBuffer, 126))
+                if (HidAPICalls.HidD_GetSerialNumberString(safeFileHandle, pointerToBuffer, 126))
                 {
                     serialNumber = Marshal.PtrToStringUni(pointerToBuffer);
                 }
 
-                if (APICalls.HidD_GetProductString(safeFileHandle, pointerToBuffer, 126))
+                if (HidAPICalls.HidD_GetProductString(safeFileHandle, pointerToBuffer, 126))
                 {
                     product = Marshal.PtrToStringUni(pointerToBuffer);
                 }
 
                 Marshal.FreeHGlobal(pointerToBuffer);
 
-                var getPreparsedDataResult = APICalls.HidD_FreePreparsedData(ref pointerToPreParsedData);
+                var getPreparsedDataResult = HidAPICalls.HidD_FreePreparsedData(ref pointerToPreParsedData);
 
                 //TODO: Deal with issues here
 
-                var deviceInformation = new DeviceInformation
+                var deviceInformation = new WindowsHidDeviceInformation
                 {
                     DevicePath = devicePath,
                     InputReportByteLength = hidCollectionCapabilities.InputReportByteLength,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Timers;
+using Device.Net;
 
 namespace Hid.Net.UWP
 {

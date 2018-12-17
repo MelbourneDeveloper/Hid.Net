@@ -2,9 +2,9 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Hid.Net
+namespace Hid.Net.Windows
 {
-    internal static class APICalls
+    public static class HidAPICalls 
     {
         #region Constants
         public const int DigcfDeviceinterface = 16;
@@ -17,11 +17,6 @@ namespace Hid.Net
         #endregion
 
         #region Methods
-
-        #region Kernel32
-        [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern SafeFileHandle CreateFile(string lpFileName, uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwCreationDisposition, uint dwFlagsAndAttributes, IntPtr hTemplateFile);
-        #endregion
 
         #region Hid
         [DllImport("hid.dll", SetLastError = true)]
@@ -47,20 +42,6 @@ namespace Hid.Net
 
         [DllImport("hid.dll", SetLastError = true)]
         internal static extern int HidP_GetCaps(IntPtr pointerToPreparsedData, ref HidCollectionCapabilities hidCollectionCapabilities);
-        #endregion
-
-        #region SetupAPI
-        [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern bool SetupDiDestroyDeviceInfoList(IntPtr deviceInfoSet);
-
-        [DllImport(@"setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern bool SetupDiEnumDeviceInterfaces(IntPtr hDevInfo, IntPtr devInfo, ref Guid interfaceClassGuid, uint memberIndex, ref SpDeviceInterfaceData deviceInterfaceData);
-
-        [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern IntPtr SetupDiGetClassDevs(ref Guid classGuid, IntPtr enumerator, IntPtr hwndParent, uint flags);
-
-        [DllImport(@"setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern bool SetupDiGetDeviceInterfaceDetail(IntPtr hDevInfo, ref SpDeviceInterfaceData deviceInterfaceData, ref SpDeviceInterfaceDetailData deviceInterfaceDetailData, uint deviceInterfaceDetailDataSize, out uint requiredSize, ref SpDeviceInfoData deviceInfoData);
         #endregion
 
         #endregion

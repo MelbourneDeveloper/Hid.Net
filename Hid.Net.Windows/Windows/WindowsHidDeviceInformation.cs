@@ -1,8 +1,9 @@
-﻿namespace Hid.Net
+﻿using Device.Net;
+
+namespace Hid.Net.Windows
 {
-    public class DeviceInformation
+    public class WindowsHidDeviceInformation : DeviceInformation
     {
-        public string DevicePath { get; set; }
         public int InputReportByteLength { get; set; }
         public string Manufacturer { get; set; }
         public int OutputReportByteLength { get; set; }
