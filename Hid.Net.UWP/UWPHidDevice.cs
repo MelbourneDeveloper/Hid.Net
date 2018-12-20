@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Device.Net;
+using System;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.HumanInterfaceDevice;
-using Windows.Devices.Usb;
-using Windows.Storage.Streams;
+using Windows.Foundation;
+using Windows.Storage;
 
 namespace Hid.Net.UWP
 {
-    public class UWPHidDevice : HidDeviceBase, IHidDevice
+    public class UWPHidDevice : DeviceBase, IDevice
     {
         #region Events
         public event EventHandler Connected;
@@ -18,9 +18,10 @@ namespace Hid.Net.UWP
         #endregion
 
         #region Fields
-        private UsbDevice _HidDevice;
-        private readonly bool _IsReading;
-        private IBuffer _LastReadData;
+        private HidDevice _HidDevice;
+        private TaskCompletionSource<byte[]> _TaskCompletionSource = null;
+        private readonly Collection<byte[]> _Chunks = new Collection<byte[]>();
+        private bool _IsReading;
         #endregion
 
         #region Public Properties
@@ -32,6 +33,26 @@ namespace Hid.Net.UWP
         #endregion
 
         #region Event Handlers
+
+        private void _HidDevice_InputReportReceived(HidDevice sender, HidInputReportReceivedEventArgs args)
+        {
+            if (!_IsReading)
+            {
+                lock (_Chunks)
+                {
+                    var bytes = InputReportToBytes(args);
+                    _Chunks.Add(bytes);
+                }
+            }
+            else
+            {
+                var bytes = InputReportToBytes(args);
+
+                _IsReading = false;
+
+                _TaskCompletionSource.SetResult(bytes);
+            }
+        }
 
         private byte[] InputReportToBytes(HidInputReportReceivedEventArgs args)
         {
@@ -125,13 +146,14 @@ namespace Hid.Net.UWP
 
             if (_HidDevice != null)
             {
+                _HidDevice.InputReportReceived += _HidDevice_InputReportReceived;
                 Connected?.Invoke(this, new EventArgs());
             }
         }
 
-        private static async Task<UsbDevice> GetDevice(string id)
+        private static async Task<HidDevice> GetDevice(string id)
         {
-            var hidDeviceOperation = UsbDevice.FromIdAsync(id);
+            var hidDeviceOperation = HidDevice.FromIdAsync(id, FileAccessMode.ReadWrite);
             var task = hidDeviceOperation.AsTask();
             var hidDevice = await task;
             return hidDevice;
@@ -147,20 +169,30 @@ namespace Hid.Net.UWP
         public void Dispose()
         {
             _HidDevice.Dispose();
+            _TaskCompletionSource?.Task?.Dispose();
         }
 
         public async Task<byte[]> ReadAsync()
         {
-            if (_LastReadData == null)
+            if (_IsReading)
             {
-                throw new Exception("No data has been read");
+                throw new Exception("Reentry");
             }
-            var retVal = new byte[64];
-            _LastReadData.CopyTo(0, retVal, 0, 64);
 
-            _LastReadData = null;
+            lock (_Chunks)
+            {
+                if (_Chunks.Count > 0)
+                {
+                    var retVal = _Chunks[0];
+                    Tracer?.Trace(false, retVal);
+                    _Chunks.RemoveAt(0);
+                    return retVal;
+                }
+            }
 
-            return retVal;
+            _IsReading = true;
+            _TaskCompletionSource = new TaskCompletionSource<byte[]>();
+            return await _TaskCompletionSource.Task;
         }
 
         public async Task WriteAsync(byte[] data)
@@ -178,22 +210,13 @@ namespace Hid.Net.UWP
             }
 
             var buffer = bytes.AsBuffer();
+            var outReport = _HidDevice.CreateOutputReport();
+            outReport.Data = buffer;
+            IAsyncOperation<uint> operation = null;
 
             try
             {
-
-                var setupPacket = new UsbSetupPacket()
-                {
-                    RequestType = new UsbControlRequestType()
-                    {
-                        Recipient = UsbControlRecipient.DefaultInterface,
-
-                        ControlTransferType = UsbControlTransferType.Vendor
-                    }
-                };
-
-                _LastReadData = await _HidDevice.SendControlInTransferAsync(setupPacket, buffer);
-
+                operation = _HidDevice.SendOutputReportAsync(outReport);
             }
             catch (ArgumentException ex)
             {
@@ -205,6 +228,8 @@ namespace Hid.Net.UWP
             }
 
             Tracer?.Trace(false, bytes);
+
+            await operation.AsTask();
         }
         #endregion
     }
